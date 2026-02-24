@@ -16,7 +16,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -26,6 +25,7 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
+import { Textarea } from '@/components/ui/textarea'
 import { regions } from '@/lib/consts'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Fragment, useState } from 'react'
@@ -73,40 +73,24 @@ const WhyInappropriatePage = () => {
   }
 
   return (
-    <Card className='sm:min-w-md'>
-      <CardHeader>
-        <CardTitle className='font-header text-lg'>Why Inappropriate</CardTitle>
-        <CardDescription>Why is this text inappropriate?</CardDescription>
-      </CardHeader>
-      <CardContent className='space-y-4'>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className='space-y-6'
-          >
-            <FormField
-              control={form.control}
-              name='text'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='uppercase text-muted-foreground text-xs'>
-                    Insert text
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='abc123...'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <Card className='min-w-sm sm:min-w-md'>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className='space-y-6'
+        >
+          <CardHeader className='flex items-center justify-center'>
+            <div className='flex-1'>
+              <CardTitle className='font-header text-lg'>
+                Why Inappropriate
+              </CardTitle>
+              <CardDescription>Why is this text inappropriate?</CardDescription>
+            </div>
             <FormField
               control={form.control}
               name='region'
               render={({ field }) => (
-                <FormItem>
+                <FormItem className='flex flex-col items-end justify-center'>
                   <FormLabel className='uppercase text-muted-foreground text-xs'>
                     Region
                   </FormLabel>
@@ -126,6 +110,26 @@ const WhyInappropriatePage = () => {
                       </SelectContent>
                     </Select>
                   </FormControl>
+                </FormItem>
+              )}
+            />
+          </CardHeader>
+          <CardContent className='space-y-4'>
+            <FormField
+              control={form.control}
+              name='text'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className='uppercase text-muted-foreground text-xs'>
+                    Insert text
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder='abc123...'
+                      {...field}
+                      className='border-border min-h-30'
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -136,39 +140,42 @@ const WhyInappropriatePage = () => {
             >
               Check
             </Button>
-          </form>
-        </Form>
-        {(loading || baseText.length > 0) && <Separator />}
-        {loading && (
-          <div className='w-full flex items-center justify-center p-2'>
-            <Spinner />
-          </div>
-        )}
-        {!loading && baseText.length > 0 && (
-          <>
-            <div>
-              <p>
-                {indexes.map(({ start, end }, i) => (
-                  <Fragment key={i}>
-                    {baseText.substring(indexes[i - 1]?.end || 0, start)}
-                    <span className='bg-destructive text-destructive-foreground'>
-                      {baseText.substring(start, end)}
-                    </span>
-                  </Fragment>
-                ))}
-                {baseText.substring(
-                  indexes[indexes.length - 1]?.end || indexes.length - 1,
-                )}
-              </p>
-            </div>
-            {indexes.length === 0 && (
-              <p className='w-full text-center uppercase text-green-700 dark:text-green-300 text-sm'>
-                ALL GOOD!
-              </p>
+            {(loading || baseText.length > 0) && <Separator />}
+            {loading && (
+              <div className='w-full flex items-center justify-center p-2'>
+                <Spinner />
+              </div>
             )}
-          </>
-        )}
-      </CardContent>
+            {!loading && baseText.length > 0 && (
+              <>
+                <div>
+                  <p>
+                    {indexes.map(({ start, end }, i) => (
+                      <Fragment key={i}>
+                        {baseText.substring(indexes[i - 1]?.end || 0, start)}
+                        <span className='bg-destructive text-destructive-foreground'>
+                          {baseText.substring(start, end)}
+                        </span>
+                      </Fragment>
+                    ))}
+                    {baseText.substring(
+                      indexes[indexes.length - 1]?.end || indexes.length - 1,
+                    )}
+                  </p>
+                </div>
+                {indexes.length === 0 ?
+                  <p className='w-full text-center uppercase text-green-700 dark:text-green-300 text-sm'>
+                    ALL GOOD!
+                  </p>
+                : <p className='w-full text-center uppercase text-destructive text-sm'>
+                    {indexes.length} ISSUE{indexes.length > 1 && 'S'}
+                  </p>
+                }
+              </>
+            )}
+          </CardContent>
+        </form>
+      </Form>
     </Card>
   )
 }

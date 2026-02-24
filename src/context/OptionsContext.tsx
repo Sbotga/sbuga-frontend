@@ -3,7 +3,7 @@
 import React, { createContext, useContext } from 'react'
 import useLocalStorage from './useLocalStorage'
 
-type Options = {
+export type Options = {
   sbuga_effects: boolean
 }
 
