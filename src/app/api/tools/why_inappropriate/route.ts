@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server'
-import apiRequest from '../../api-request'
+import mainApi from '../../Api'
 
 export const POST = async (request: Request) => {
   const body = await request.json()
-  const response = await apiRequest('/api/tools/why_inappropriate', {
-    body,
-  })
+
+  const response = await mainApi.api.mainApiToolsWhyInappropriatePost(body)
 
   const data = await response.json()
 

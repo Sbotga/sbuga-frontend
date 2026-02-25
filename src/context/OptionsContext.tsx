@@ -2,9 +2,11 @@
 
 import React, { createContext, useContext } from 'react'
 import useLocalStorage from './useLocalStorage'
+import { region } from '@/lib/consts'
 
 export type Options = {
   sbuga_effects: boolean
+  default_region: region
 }
 
 const OptionsContext = createContext<
@@ -18,6 +20,7 @@ export const OptionsProvider = ({
 }) => {
   const [options, setOptions] = useLocalStorage<Options>('options', {
     sbuga_effects: false,
+    default_region: 'en',
   })
 
   return (

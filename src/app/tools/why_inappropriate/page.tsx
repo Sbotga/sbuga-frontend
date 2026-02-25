@@ -1,5 +1,6 @@
 'use client'
 
+import RegionSelect from '@/components/region-select'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -16,25 +17,19 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
-import { regions } from '@/lib/consts'
+import { useOptions } from '@/context/OptionsContext'
+import { region, regions } from '@/lib/consts'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Fragment, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
 
 const formSchema = z.object({
-  text: z.string(),
-  region: z.string().refine((s) => regions.includes(s)),
+  text: z.string().max(1024, 'Cannot exceed 1,024 characters.'),
+  region: z.literal(regions).refine((s) => regions.includes(s)),
 })
 
 const WhyInappropriatePage = () => {
@@ -46,11 +41,15 @@ const WhyInappropriatePage = () => {
     }[]
   >([])
   const [baseText, setBaseText] = useState('')
+  const [error, setError] = useState('')
+
+  const [options, _] = useOptions()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       text: '',
+      region: options.default_region,
     },
   })
 
@@ -65,7 +64,12 @@ const WhyInappropriatePage = () => {
       })
 
       const json = await req.json()
-      setIndexes(json.indexes)
+      if ('indexes' in json) {
+        setIndexes(json.indexes)
+      } else {
+        setIndexes([])
+        setError(JSON.stringify(json))
+      }
       setBaseText(values.text)
     } finally {
       setLoading(false)
@@ -73,7 +77,10 @@ const WhyInappropriatePage = () => {
   }
 
   return (
-    <Card className='min-w-sm sm:min-w-md'>
+    <Card
+      className='min-w-sm sm:w-md md:w-lg wrap-break-word'
+      variant='main'
+    >
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -95,20 +102,12 @@ const WhyInappropriatePage = () => {
                     Region
                   </FormLabel>
                   <FormControl>
-                    <Select
+                    <RegionSelect
                       {...field}
-                      onValueChange={(newVal) =>
+                      onValueChange={(newVal: region) =>
                         form.setValue('region', newVal)
                       }
-                    >
-                      <SelectTrigger className='border-border'>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value='en'>EN</SelectItem>
-                        <SelectItem value='jp'>JP</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -122,6 +121,7 @@ const WhyInappropriatePage = () => {
                 <FormItem>
                   <FormLabel className='uppercase text-muted-foreground text-xs'>
                     Insert text
+                    {field.value.length > 0 && ` (${field.value.length}/1024)`}
                   </FormLabel>
                   <FormControl>
                     <Textarea
@@ -149,7 +149,7 @@ const WhyInappropriatePage = () => {
             {!loading && baseText.length > 0 && (
               <>
                 <div>
-                  <p>
+                  <p className='whitespace-pre-wrap'>
                     {indexes.map(({ start, end }, i) => (
                       <Fragment key={i}>
                         {baseText.substring(indexes[i - 1]?.end || 0, start)}
@@ -171,6 +171,7 @@ const WhyInappropriatePage = () => {
                     {indexes.length} ISSUE{indexes.length > 1 && 'S'}
                   </p>
                 }
+                {error}
               </>
             )}
           </CardContent>

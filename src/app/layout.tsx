@@ -4,6 +4,7 @@ import './globals.css'
 import MainLayout from '@/components/main-layout'
 import { ThemeProvider } from '@/components/theme-provider'
 import { OptionsProvider } from '@/context/OptionsContext'
+import { AuthProvider } from '@/context/AuthContext'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -34,16 +35,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute='class'
-          defaultTheme='system'
-          enableSystem
-          // disableTransitionOnChange
-        >
-          <OptionsProvider>
-            <MainLayout>{children}</MainLayout>
-          </OptionsProvider>
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider
+            attribute='class'
+            defaultTheme='system'
+            enableSystem
+            // disableTransitionOnChange
+          >
+            <OptionsProvider>
+              <MainLayout>{children}</MainLayout>
+            </OptionsProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   )

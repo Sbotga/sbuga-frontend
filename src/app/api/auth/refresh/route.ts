@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import apiRequest from '../../api-request'
+import mainApi from '../../Api'
 
 export const POST = async () => {
   const cookieStore = await cookies()
@@ -9,10 +9,8 @@ export const POST = async () => {
   if (!refreshToken)
     return NextResponse.json({ error: 'No refresh token' }, { status: 401 })
 
-  const response = await apiRequest('/api/accounts/session/refresh', {
-    headers: {
-      Authorization: `Bearer ${refreshToken}`,
-    },
+  const response = await mainApi.api.mainApiAccountsSessionRefreshPost({
+    headers: { Authorization: refreshToken },
   })
 
   if (!response.ok) {

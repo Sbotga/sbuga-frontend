@@ -1,4 +1,6 @@
-export const regions = ['en', 'jp']
+export const regions = ['en', 'jp'] as const
+
+export type region = (typeof regions)[number]
 
 export const allSbuga = [
   'sbuga_cute.png',

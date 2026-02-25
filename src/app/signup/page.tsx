@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -33,6 +34,10 @@ const signupSchema = z
   })
 
 const SignupPage = () => {
+  const [captchaKey, setCaptchaKey] = useState<string>(() =>
+    Date.now().toString(),
+  )
+
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -57,11 +62,17 @@ const SignupPage = () => {
       method: 'POST',
     })
     console.log(await res.json())
+    // reset captcha token in form and remount Turnstile
+    form.setValue('turnstile_response', '')
+    setCaptchaKey(Date.now().toString())
     // ...
   }
 
   return (
-    <Card className='sm:min-w-md mx-2'>
+    <Card
+      className='sm:min-w-md mx-2'
+      variant='main'
+    >
       <CardHeader>
         <CardTitle className='font-header text-xl'>Sign Up</CardTitle>
       </CardHeader>
@@ -157,6 +168,7 @@ const SignupPage = () => {
                       value='1x00000000000000000000AA'
                     /> */}
                     <Turnstile
+                      key={captchaKey}
                       // 1x00000000000000000000AA
                       siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ''}
                       onSuccess={(token) =>

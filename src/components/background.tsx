@@ -47,10 +47,11 @@ const Background = () => {
     const ro = new ResizeObserver(setCanvasSize)
 
     const mouseMove = (e: MouseEvent) => {
+      const rect = canvasRef.current?.getBoundingClientRect()
       sbugas.current.push({
         pos: {
-          x: e.x - (canvasRef.current?.parentElement?.offsetLeft ?? 0) - 10,
-          y: e.y - (canvasRef.current?.parentElement?.offsetTop ?? 0) - 10,
+          x: e.clientX - (rect?.left ?? 0) - 10,
+          y: e.clientY - (rect?.top ?? 0) - 10,
         },
         vel: {
           x: 0,
@@ -66,13 +67,14 @@ const Background = () => {
     }
 
     const mouseClick = (e: MouseEvent) => {
+      const rect = canvasRef.current?.getBoundingClientRect()
       const offset = Math.random() * 2 * Math.PI
       for (let i = 0; i <= 2 * Math.PI; i += (Math.random() * Math.PI) / 2) {
         const speed = Math.random() * 0.35
         sbugas.current.push({
           pos: {
-            x: e.x - (canvasRef.current?.parentElement?.offsetLeft ?? 0) - 10,
-            y: e.y - (canvasRef.current?.parentElement?.offsetTop ?? 0) - 10,
+            x: e.clientX - (rect?.left ?? 0) - 10,
+            y: e.clientY - (rect?.top ?? 0) - 10,
           },
           vel: {
             x: Math.cos(i + offset) * speed,
@@ -89,7 +91,7 @@ const Background = () => {
     }
 
     if (canvasRef.current) {
-      ro.observe(canvasRef.current)
+      ro.observe(canvasRef.current.parentElement!)
       window.addEventListener('mousemove', mouseMove)
       window.addEventListener('mousedown', mouseClick)
     }
@@ -181,7 +183,7 @@ const Background = () => {
   return (
     options.sbuga_effects && (
       <canvas
-        className={'absolute inset-0 z-0'}
+        className={'absolute top-0 bottom-0 left-0 right-0 z-0'}
         ref={canvasRef}
         id='canvas'
       ></canvas>

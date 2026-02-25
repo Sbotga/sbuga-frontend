@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Turnstile } from '@marsidev/react-turnstile'
 import Link from 'next/link'
@@ -17,7 +18,8 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { apiClient } from '@/lib/api-client'
+import { useAuth } from '@/context/AuthContext'
+import { redirect } from 'next/navigation'
 
 const loginSchema = z.object({
   username: z.string(),
@@ -26,6 +28,12 @@ const loginSchema = z.object({
 })
 
 const LoginPage = () => {
+  const { user, login, loading } = useAuth()
+
+  const [captchaKey, setCaptchaKey] = useState<string>(() =>
+    Date.now().toString(),
+  )
+
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -35,23 +43,41 @@ const LoginPage = () => {
     },
   })
 
+  useEffect(() => {
+    if (loading) return
+    if (user) redirect('/')
+  }, [loading, user])
+
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     // handle login auth
     // console.log(values)
-    const res = await apiClient('/api/auth/login', {
-      body: JSON.stringify({
-        username: values.username,
-        password: values.password,
-        turnstile_response: values.turnstile_response,
-      }),
-      method: 'POST',
+    // const res = await apiClient('/api/auth/login', {
+    //   body: JSON.stringify({
+    //     username: values.username,
+    //     password: values.password,
+    //     turnstile_response: values.turnstile_response,
+    //   }),
+    //   method: 'POST',
+    // })
+    // console.log(await res.json())
+    // reset captcha token in form and remount Turnstile
+
+    login({
+      username: values.username,
+      password: values.password,
+      turnstile_response: values.turnstile_response,
     })
-    console.log(await res.json())
+
+    form.setValue('turnstile_response', '')
+    setCaptchaKey(Date.now().toString())
     // ...
   }
 
   return (
-    <Card className='sm:min-w-md mx-2'>
+    <Card
+      className='sm:min-w-md mx-2'
+      variant='main'
+    >
       <CardHeader>
         <CardTitle className='font-header text-xl'>Log In</CardTitle>
       </CardHeader>
@@ -115,6 +141,7 @@ const LoginPage = () => {
                       <FormMessage />
                     </FormItem> */}
                     <Turnstile
+                      key={captchaKey}
                       // 1x00000000000000000000AA
                       siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ''}
                       onSuccess={(token) =>

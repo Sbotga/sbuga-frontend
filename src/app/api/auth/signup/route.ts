@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server'
-import apiRequest from '../../api-request'
+import mainApi from '../../Api'
 
 export const POST = async (request: Request) => {
   const body = await request.json()
 
-  const res = await apiRequest('/api/accounts/signup', {
-    body,
-  })
+  const res = await mainApi.api.mainApiAccountsSignupPost(body)
 
   if (!res.ok) return NextResponse.json(await res.json())
 

@@ -11,8 +11,14 @@ import {
 
 interface User {
   id: number
+  display_name: string
   username: string
-  displayName: string
+  created_at: number
+  updated_at: number
+  description: string
+  profile_hash: string
+  banner_hash: string
+  banned: boolean
 }
 
 interface AuthContextType {
@@ -36,6 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const initAuth = async () => {
       try {
         const res = await apiClient('/api/auth/me')
+        console.log(res)
         if (res.ok) {
           const data = await res.json()
           setUser(data.user)
