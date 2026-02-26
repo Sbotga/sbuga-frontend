@@ -701,7 +701,71 @@ export class Api<
       }),
 
     /**
-     * @description Returns the current PJSK event data including the top 100 leaderboard and ranking borders. `event_status` is one of `going`, `counting`, or `end`. Data is cached for **5 minutes** — `next_available_update` indicates when fresh data will be available. If there is no active event, `event_id` will be `null` and no leaderboard or border data is returned.
+     * @description Returns a raw asset file from the PJSK asset directory for the given region.
+     *
+     * @tags PJSK Assets
+     * @name GetAssetApiPjskDataAssetsAssetPathGet
+     * @summary Get asset file
+     * @request GET:/api/pjsk_data/assets/{asset_path}
+     */
+    getAssetApiPjskDataAssetsAssetPathGet: (
+      assetPath: string,
+      query: {
+        /** Region */
+        region: 'en' | 'jp'
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/pjsk_data/assets/${assetPath}`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Returns a list of all comics from the PJSK master data for a given region. `image_type` defaults to `webp`. `from_user_rank` and `to_user_rank` indicate the player rank range required to unlock the comic.
+     *
+     * @tags PJSK Data
+     * @name GetComicsApiPjskDataComicsGet
+     * @summary Get comics
+     * @request GET:/api/pjsk_data/comics
+     */
+    getComicsApiPjskDataComicsGet: (
+      query: {
+        /** Region */
+        region: 'en' | 'jp'
+        /**
+         * Image Type
+         * @default "webp"
+         */
+        image_type?: 'png' | 'webp'
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/pjsk_data/comics`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Returns the current PJSK event data including the top 100 leaderboard and ranking borders. `event_status` is one of `going`, `counting`, or `end`. Data is cached for **5 minutes** - `next_available_update` indicates when fresh data will be available. If there is no active event, `event_id` will be `null` and no leaderboard or border data is returned.
      *
      * @tags PJSK Data
      * @name CurrentEventApiPjskDataCurrentEventGet
@@ -730,7 +794,7 @@ export class Api<
       }),
 
     /**
-     * @description Returns the current PJSK ranked season data including the top 100 leaderboard. `season_status` is one of `going` or `end`. Data is cached for **5 minutes** — `next_available_update` indicates when fresh data will be available. If there is no active season, `season_id` will be `null` and no leaderboard data is returned.
+     * @description Returns the current PJSK ranked season data including the top 100 leaderboard. `season_status` is one of `going` or `end`. Data is cached for **5 minutes** - `next_available_update` indicates when fresh data will be available. If there is no active season, `season_id` will be `null` and no leaderboard data is returned.
      *
      * @tags PJSK Data
      * @name CurrentRankedApiPjskDataCurrentRankedGet
@@ -752,6 +816,78 @@ export class Api<
         }
       >({
         path: `/api/pjsk_data/current_ranked`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Returns a list of all stamps from the PJSK master data for a given region. `image_url` points to the stamp image and `balloon_url` points to the balloon overlay. `image_type` defaults to `webp`. `published_at` is in milliseconds since Unix epoch.
+     *
+     * @tags PJSK Data
+     * @name GetStampsApiPjskDataStampsGet
+     * @summary Get stamps
+     * @request GET:/api/pjsk_data/stamps
+     */
+    getStampsApiPjskDataStampsGet: (
+      query: {
+        /** Region */
+        region: 'en' | 'jp'
+        /**
+         * Image Type
+         * @default "webp"
+         */
+        image_type?: 'png' | 'webp'
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/pjsk_data/stamps`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Returns a PNG image of the chart for a given music ID, difficulty, and region. If the chart has not been generated yet, it will be generated on first request — this may take a while. Subsequent requests are served from cache. `mirrored` flips the lanes horizontally and is never cached.
+     *
+     * @tags PJSK Tools
+     * @name GetChartApiToolsChartViewerGet
+     * @summary Get chart image
+     * @request GET:/api/tools/chart_viewer
+     */
+    getChartApiToolsChartViewerGet: (
+      query: {
+        /** Music Id */
+        music_id: number
+        /** Difficulty */
+        difficulty: 'easy' | 'normal' | 'hard' | 'expert' | 'master' | 'append'
+        /** Region */
+        region: 'en' | 'jp'
+        /**
+         * Mirrored
+         * @default false
+         */
+        mirrored?: boolean
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/tools/chart_viewer`,
         method: 'GET',
         query: query,
         format: 'json',
@@ -811,6 +947,3 @@ export class Api<
       }),
   }
 }
-
-const mainApi = new Api({ baseUrl: process.env.API_URL })
-export default mainApi
