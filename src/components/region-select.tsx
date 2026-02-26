@@ -1,3 +1,5 @@
+'use client'
+
 import { regions } from '@/lib/consts'
 import {
   Select,
@@ -8,6 +10,7 @@ import {
 } from './ui/select'
 import { Select as SelectPrimitive } from 'radix-ui'
 import { twMerge } from 'tailwind-merge'
+import useTranslation from '@/hooks/use-translation'
 
 const RegionSelect = ({
   ...props
@@ -15,6 +18,7 @@ const RegionSelect = ({
   className?: string
   size?: 'sm' | 'default'
 }) => {
+  const { loc } = useTranslation()
   return (
     <Select {...{ ...props, className: undefined }}>
       <SelectTrigger
@@ -29,7 +33,7 @@ const RegionSelect = ({
             key={i}
             value={r}
           >
-            {r.toUpperCase()}
+            {loc(`regions.${r}`)}
           </SelectItem>
         ))}
       </SelectContent>

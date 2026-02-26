@@ -1,1 +1,72 @@
-{}
+{
+  "general": {
+    "loading": "Loading..."
+  },
+  "regions": {
+    "title": "Region",
+    "en": "EN (Global)",
+    "jp": "JP"
+  },
+  "languages": {
+    "en": "English"
+  },
+  "tools": {
+    "title": "Tools",
+    "why_inappropriate": {
+      "title": "Why Inappropriate?",
+      "description": "Why is this text inappropriate?",
+      "form": {
+        "max_length": "Cannot exceed 1,024 characters.",
+        "insert_text": "Insert Text"
+      },
+      "check": "Check",
+      "results": {
+        "all_good": "All good!",
+        "issue_single": "{issues} issue",
+        "issue_plural": "{issues} issues"
+      }
+    }
+  },
+  "components": {
+    "navbar": {
+      "options_header": "Options",
+      "options": {
+        "bg_effects": "Background Effects",
+        "default_region": "Default Server",
+        "language": "Language",
+        "theme": "Theme"
+      }
+    },
+    "footer": {
+      "discord": "Discord",
+      "github": "Github"
+    }
+  },
+  "login": {
+    "log_in": "Log In",
+    "no_account": "Don't have an account?",
+    "form": {
+      "complete_captcha": "Please complete the captcha.",
+      "required": "This field is required.",
+      "username": "Username",
+      "password": "Password"
+    },
+    "messages": {
+      "invalid_login": "Invalid Login"
+    }
+  },
+  "signup": {
+    "sign_up": "Sign Up",
+    "have_account": "Already have an account?",
+    "form": {
+      "min_3": "Must be at least 3 charcters.",
+      "min_8": "Must be at least 8 charcters.",
+      "password_match": "Passwords must match.",
+      "display_name": "Display name",
+      "confirm_password": "Confirm Password"
+    },
+    "messages": {
+      "username_taken": "This username is already taken"
+    }
+  }
+}

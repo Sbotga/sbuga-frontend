@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -13,30 +13,38 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { apiClient } from '@/lib/api-client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Turnstile } from '@marsidev/react-turnstile'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import useTranslation from '@/hooks/use-translation'
+import { useAuth } from '@/context/AuthContext'
+import { redirect } from 'next/navigation'
+import { Spinner } from '@/components/ui/spinner'
 
 const signupSchema = z
   .object({
-    username: z.string().min(3, 'Must be at least 3 charcters'),
+    username: z.string().min(3, 'signup.form.min_3'),
     display_name: z.string(),
-    password: z.string().min(8, 'Must be at least 8 characters'),
+    password: z.string().min(8, 'signup.form.min_8'),
     confirm_password: z.string(),
-    turnstile_response: z.string().min(1, 'Please complete the captcha.'),
+    turnstile_response: z.string().min(1, 'login.form.captcha'),
   })
   .refine((data) => data.password === data.confirm_password, {
-    message: 'Passwords must match',
+    message: 'signup.form.password_match',
     path: ['confirm_password'],
   })
 
 const SignupPage = () => {
+  const { signup, loading: authLoading, user } = useAuth()
+  const { loc } = useTranslation()
   const [captchaKey, setCaptchaKey] = useState<string>(() =>
     Date.now().toString(),
   )
+
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
 
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
@@ -49,19 +57,37 @@ const SignupPage = () => {
     },
   })
 
+  useEffect(() => {
+    if (authLoading) return
+    if (user) redirect('/')
+  }, [authLoading, user])
+
   const onSubmit = async (values: z.infer<typeof signupSchema>) => {
     // handle login auth
     // console.log(values)
-    const res = await apiClient('/api/auth/signup', {
-      body: JSON.stringify({
-        username: values.username,
-        display_name: values.display_name,
-        password: values.password,
-        turnstile_response: values.turnstile_response,
-      }),
-      method: 'POST',
+    // const res = await apiClient('/api/auth/signup', {
+    //   body: JSON.stringify({
+    //     username: values.username,
+    //     display_name: values.display_name,
+    //     password: values.password,
+    //     turnstile_response: values.turnstile_response,
+    //   }),
+    //   method: 'POST',
+    // })
+    // console.log(await res.json())
+    setLoading(true)
+    setMessage('')
+    const { success, message } = await signup({
+      username: values.username,
+      display_name: values.display_name,
+      password: values.password,
+      turnstile_response: values.turnstile_response,
     })
-    console.log(await res.json())
+    if (success) {
+      return redirect('/')
+    }
+    setLoading(false)
+    setMessage(`signup.messages.${message}`)
     // reset captcha token in form and remount Turnstile
     form.setValue('turnstile_response', '')
     setCaptchaKey(Date.now().toString())
@@ -74,7 +100,9 @@ const SignupPage = () => {
       variant='main'
     >
       <CardHeader>
-        <CardTitle className='font-header text-xl'>Sign Up</CardTitle>
+        <CardTitle className='font-header text-xl'>
+          {loc('signup.sign_up')}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -88,7 +116,7 @@ const SignupPage = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='uppercase text-muted-foreground text-xs'>
-                    Username
+                    {loc('login.form.username')}
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -96,7 +124,7 @@ const SignupPage = () => {
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage processor={loc as (s: string) => string} />
                 </FormItem>
               )}
             />
@@ -106,7 +134,7 @@ const SignupPage = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='uppercase text-muted-foreground text-xs'>
-                    Display Name
+                    {loc('signup.form.display_name')}
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -114,7 +142,7 @@ const SignupPage = () => {
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage processor={loc as (s: string) => string} />
                 </FormItem>
               )}
             />
@@ -124,7 +152,7 @@ const SignupPage = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='uppercase text-muted-foreground text-xs'>
-                    Password
+                    {loc('login.form.password')}
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -133,7 +161,7 @@ const SignupPage = () => {
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage processor={loc as (s: string) => string} />
                 </FormItem>
               )}
             />
@@ -143,7 +171,7 @@ const SignupPage = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='uppercase text-muted-foreground text-xs'>
-                    Confirm Password
+                    {loc('signup.form.confirm_password')}
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -152,7 +180,7 @@ const SignupPage = () => {
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage processor={loc as (s: string) => string} />
                 </FormItem>
               )}
             />
@@ -177,15 +205,20 @@ const SignupPage = () => {
                       onExpire={() => form.setValue('turnstile_response', '')}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage processor={loc as (s: string) => string} />
                 </FormItem>
               )}
             />
+            {message && (
+              <p className='w-full text-center text-sm text-destructive mb-2'>
+                {loc(message as any)}
+              </p>
+            )}
             <Button
               type='submit'
               className='w-full'
             >
-              Sign Up
+              {loc('signup.sign_up')}
             </Button>
           </form>
         </Form>
@@ -193,7 +226,7 @@ const SignupPage = () => {
           <div className='relative flex items-center gap-2'>
             <Separator className='flex-1' />
             <span className='shrink-0 px-2 text-muted-foreground text-xs'>
-              Already an account?
+              {loc('signup.have_account')}
             </span>
             <Separator className='flex-1' />
           </div>
@@ -203,9 +236,14 @@ const SignupPage = () => {
           variant='secondary'
           className='w-full'
         >
-          <Link href='/login'>Log In</Link>
+          <Link href='/login'>{loc('login.log_in')}</Link>
         </Button>
       </CardContent>
+      {loading && (
+        <div className='absolute top-0 left-0 bottom-0 right-0 bg-background/50 flex items-center justify-center'>
+          <Spinner className='size-15' />
+        </div>
+      )}
     </Card>
   )
 }

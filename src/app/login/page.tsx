@@ -20,15 +20,21 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { useAuth } from '@/context/AuthContext'
 import { redirect } from 'next/navigation'
+import useTranslation from '@/hooks/use-translation'
+import { Spinner } from '@/components/ui/spinner'
 
 const loginSchema = z.object({
-  username: z.string(),
-  password: z.string(),
-  turnstile_response: z.string().min(1, 'Please complete the captcha.'),
+  username: z.string().min(1, 'login.form.required'),
+  password: z.string().min(1, 'login.form.required'),
+  turnstile_response: z.string().min(1, 'login.form.complete_captcha'),
 })
 
 const LoginPage = () => {
-  const { user, login, loading } = useAuth()
+  const { loc } = useTranslation()
+
+  const { user, login, loading: authLoading } = useAuth()
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
 
   const [captchaKey, setCaptchaKey] = useState<string>(() =>
     Date.now().toString(),
@@ -44,9 +50,9 @@ const LoginPage = () => {
   })
 
   useEffect(() => {
-    if (loading) return
+    if (authLoading) return
     if (user) redirect('/')
-  }, [loading, user])
+  }, [authLoading, user])
 
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     // handle login auth
@@ -62,11 +68,18 @@ const LoginPage = () => {
     // console.log(await res.json())
     // reset captcha token in form and remount Turnstile
 
-    login({
+    setLoading(true)
+    setMessage('')
+    const { success, message } = await login({
       username: values.username,
       password: values.password,
       turnstile_response: values.turnstile_response,
     })
+    if (success) {
+      return redirect('/')
+    }
+    setLoading(false)
+    setMessage(`login.messages.${message}`)
 
     form.setValue('turnstile_response', '')
     setCaptchaKey(Date.now().toString())
@@ -75,11 +88,13 @@ const LoginPage = () => {
 
   return (
     <Card
-      className='sm:min-w-md mx-2'
+      className='sm:min-w-md mx-2 relative overflow-hidden'
       variant='main'
     >
       <CardHeader>
-        <CardTitle className='font-header text-xl'>Log In</CardTitle>
+        <CardTitle className='font-header text-xl'>
+          {loc('login.log_in')}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -93,7 +108,7 @@ const LoginPage = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='uppercase text-muted-foreground text-xs'>
-                    Username
+                    {loc('login.form.username')}
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -101,7 +116,7 @@ const LoginPage = () => {
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage processor={loc as (s: string) => string} />
                 </FormItem>
               )}
             />
@@ -111,7 +126,7 @@ const LoginPage = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='uppercase text-muted-foreground text-xs'>
-                    Password
+                    {loc('login.form.password')}
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -120,7 +135,7 @@ const LoginPage = () => {
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage processor={loc as (s: string) => string} />
                 </FormItem>
               )}
             />
@@ -150,15 +165,20 @@ const LoginPage = () => {
                       onExpire={() => form.setValue('turnstile_response', '')}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage processor={loc as (s: string) => string} />
                 </FormItem>
               )}
             />
+            {message && (
+              <p className='w-full text-center text-sm text-destructive mb-2'>
+                {loc(message as any)}
+              </p>
+            )}
             <Button
               type='submit'
               className='w-full'
             >
-              Log In
+              {loc('login.log_in')}
             </Button>
           </form>
         </Form>
@@ -166,7 +186,7 @@ const LoginPage = () => {
           <div className='relative flex items-center gap-2'>
             <Separator className='flex-1' />
             <span className='shrink-0 px-2 text-muted-foreground text-xs'>
-              Don't have an account?
+              {loc('login.no_account')}
             </span>
             <Separator className='flex-1' />
           </div>
@@ -176,9 +196,14 @@ const LoginPage = () => {
           variant='secondary'
           className='w-full'
         >
-          <Link href='/signup'>Sign Up</Link>
+          <Link href='/signup'>{loc('signup.sign_up')}</Link>
         </Button>
       </CardContent>
+      {loading && (
+        <div className='absolute top-0 left-0 bottom-0 right-0 bg-background/50 flex items-center justify-center'>
+          <Spinner className='size-15' />
+        </div>
+      )}
     </Card>
   )
 }

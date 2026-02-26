@@ -21,6 +21,7 @@ import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { useOptions } from '@/context/OptionsContext'
+import useTranslation from '@/hooks/use-translation'
 import { region, regions } from '@/lib/consts'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Fragment, useState } from 'react'
@@ -28,11 +29,12 @@ import { useForm } from 'react-hook-form'
 import z from 'zod'
 
 const formSchema = z.object({
-  text: z.string().max(1024, 'Cannot exceed 1,024 characters.'),
+  text: z.string().max(1024, 'tools.why_inappropriate.form.max_length'),
   region: z.literal(regions).refine((s) => regions.includes(s)),
 })
 
 const WhyInappropriatePage = () => {
+  const { loc } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [indexes, setIndexes] = useState<
     {
@@ -89,9 +91,11 @@ const WhyInappropriatePage = () => {
           <CardHeader className='flex items-center justify-center'>
             <div className='flex-1'>
               <CardTitle className='font-header text-lg'>
-                Why Inappropriate
+                {loc('tools.why_inappropriate.title')}
               </CardTitle>
-              <CardDescription>Why is this text inappropriate?</CardDescription>
+              <CardDescription>
+                {loc('tools.why_inappropriate.description')}
+              </CardDescription>
             </div>
             <FormField
               control={form.control}
@@ -99,7 +103,7 @@ const WhyInappropriatePage = () => {
               render={({ field }) => (
                 <FormItem className='flex flex-col items-end justify-center'>
                   <FormLabel className='uppercase text-muted-foreground text-xs'>
-                    Region
+                    {loc('regions.title')}
                   </FormLabel>
                   <FormControl>
                     <RegionSelect
@@ -120,7 +124,7 @@ const WhyInappropriatePage = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='uppercase text-muted-foreground text-xs'>
-                    Insert text
+                    {loc('tools.why_inappropriate.form.insert_text')}
                     {field.value.length > 0 && ` (${field.value.length}/1024)`}
                   </FormLabel>
                   <FormControl>
@@ -138,7 +142,7 @@ const WhyInappropriatePage = () => {
               type='submit'
               className='w-full'
             >
-              Check
+              {loc('tools.why_inappropriate.check')}
             </Button>
             {(loading || baseText.length > 0) && <Separator />}
             {loading && (
@@ -165,10 +169,15 @@ const WhyInappropriatePage = () => {
                 </div>
                 {indexes.length === 0 ?
                   <p className='w-full text-center uppercase text-green-700 dark:text-green-300 text-sm'>
-                    ALL GOOD!
+                    {loc('tools.why_inappropriate.results.all_good')}
                   </p>
                 : <p className='w-full text-center uppercase text-destructive text-sm'>
-                    {indexes.length} ISSUE{indexes.length > 1 && 'S'}
+                    {loc(
+                      indexes.length > 1 ?
+                        'tools.why_inappropriate.results.issue_plural'
+                      : 'tools.why_inappropriate.results.issue_single',
+                      { issues: indexes.length },
+                    )}
                   </p>
                 }
                 {error}

@@ -6,7 +6,10 @@ export const POST = async (request: Request) => {
 
   const res = await mainApi.api.mainApiAccountsSignupPost(body)
 
-  if (!res.ok) return NextResponse.json(await res.json())
+  if (!res.ok)
+    return new NextResponse(JSON.stringify(await res.json()), {
+      status: res.status,
+    })
 
   const { access_token, refresh_token, user } = await res.json()
 

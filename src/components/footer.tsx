@@ -1,8 +1,11 @@
+'use client'
+
 import Link from 'next/link'
 import { Button } from './ui/button'
 import Image from 'next/image'
 import { Dot } from 'lucide-react'
 import React from 'react'
+import useTranslation from '@/hooks/use-translation'
 
 const links = [
   {
@@ -15,7 +18,7 @@ const links = [
         className='dark:invert size-5'
       />
     ),
-    name: 'Discord',
+    name: 'discord',
     href: 'https://discord.com/',
   },
   {
@@ -28,12 +31,14 @@ const links = [
         className='dark:invert size-5'
       />
     ),
-    name: 'Github',
+    name: 'github',
     href: 'https://github.com/Sbotga/',
   },
-]
+] as const
 
 const Footer = () => {
+  const { loc } = useTranslation()
+
   return (
     <div className='w-full p-4 flex items-center justify-center border-t border-border'>
       {links.map((l, i) => (
@@ -45,7 +50,7 @@ const Footer = () => {
           >
             <Link href={l.href}>
               <l.icon />
-              {l.name}
+              {loc(`components.footer.${l.name}`)}
             </Link>
           </Button>
           {i !== links.length - 1 && <Dot className='text-foreground' />}

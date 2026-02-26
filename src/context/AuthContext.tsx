@@ -28,7 +28,13 @@ interface AuthContextType {
     username: string
     password: string
     turnstile_response: string
-  }) => Promise<void>
+  }) => Promise<{ success: boolean; message: string | null }>
+  signup: (credentials: {
+    username: string
+    display_name: string
+    password: string
+    turnstile_response: string
+  }) => Promise<{ success: boolean; message: string | null }>
   logout: () => void
 }
 
@@ -60,7 +66,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     password: string
     turnstile_response: string
   }) => {
-    const res = await apiClient('/api/auth/login', {
+    const res = await apiClient(
+      '/api/auth/login',
+      {
+        method: 'POST',
+        body: JSON.stringify(credentials),
+      },
+      { unprotected: true },
+    )
+
+    if (res.ok) {
+      const { user } = await res.json()
+      setUser(user)
+
+      return { success: true, message: '' }
+    }
+
+    return { success: false, message: (await res.json()).detail }
+  }
+
+  const signup = async (credentials: {
+    username: string
+    display_name: string
+    password: string
+    turnstile_response: string
+  }) => {
+    const res = await apiClient('/api/auth/signup', {
       method: 'POST',
       body: JSON.stringify(credentials),
     })
@@ -68,7 +99,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (res.ok) {
       const { user } = await res.json()
       setUser(user)
+
+      return { success: true, message: '' }
     }
+
+    return { success: false, message: (await res.json()).detail }
   }
 
   const logout = async () => {
@@ -77,7 +112,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, signup }}>
       {children}
     </AuthContext.Provider>
   )
