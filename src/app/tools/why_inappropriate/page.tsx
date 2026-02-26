@@ -22,6 +22,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { useOptions } from '@/context/OptionsContext'
 import useTranslation from '@/hooks/use-translation'
+import { apiClient } from '@/lib/api-client'
 import { region, regions } from '@/lib/consts'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Fragment, useState } from 'react'
@@ -60,10 +61,14 @@ const WhyInappropriatePage = () => {
     setBaseText('')
 
     try {
-      const req = await fetch('/api/tools/why_inappropriate', {
-        body: JSON.stringify(values),
-        method: 'POST',
-      })
+      const req = await apiClient(
+        '/api/tools/why_inappropriate',
+        {
+          body: JSON.stringify(values),
+          method: 'POST',
+        },
+        { unprotected: true },
+      )
 
       const json = await req.json()
       if ('indexes' in json) {

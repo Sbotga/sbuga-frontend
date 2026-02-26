@@ -8,6 +8,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
+  NavigationMenuViewport,
 } from './ui/navigation-menu'
 import { Button } from './ui/button'
 import { Menu, Moon, Sun, XIcon } from 'lucide-react'
@@ -30,8 +31,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select'
+import { useAuth } from '@/context/AuthContext'
 
 const tools = ['why_inappropriate'] as const
+const information = ['comic_viewer'] as const
 
 const OptionsMenu = ({
   options,
@@ -46,6 +49,7 @@ const OptionsMenu = ({
   setTheme: (theme: string) => void
   setMenuOpened: (o: boolean) => void
 }) => {
+  const { user, loading } = useAuth()
   const { loc } = useTranslation()
   return (
     <div className='flex flex-col items-center justify-center w-full h-full gap-2 isolate'>
@@ -117,7 +121,7 @@ const OptionsMenu = ({
         <span />
         <AccountButton
           onClick={() => {
-            setMenuOpened(false)
+            if (!user && !loading) setMenuOpened(false)
           }}
         />
       </div>
@@ -150,29 +154,40 @@ const Navbar = () => {
           <h2 className='font-bold font-header'>Sbuga!</h2>
         </Link>
         <div className='sm:flex items-center justify-center hidden'>
-          <NavigationMenu className='w-auto'>
+          <NavigationMenu>
             <NavigationMenuList>
-              {/* <NavigationMenuItem>
-              <NavigationMenuLink
-                asChild
-                className={navigationMenuTriggerStyle()}
-              >
-                <Link href='/a'>A</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem> */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger>
                   {loc('tools.title')}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className='grid w-[400px] gap-2'>
-                    {tools.map((tool, i) => (
+                    {tools.map((page, i) => (
                       <ListItem
                         key={i}
-                        title={loc(`tools.${tool}.title`)}
-                        href={`/tools/${tool}`}
+                        title={loc(`tools.${page}.title`)}
+                        href={`/tools/${page}`}
                       >
-                        {loc(`tools.${tool}.description`)}
+                        {loc(`tools.${page}.description`)}
+                      </ListItem>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>
+                  {loc('information.title')}
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className='grid w-[400px] gap-2'>
+                    {information.map((page, i) => (
+                      <ListItem
+                        key={i}
+                        title={loc(`information.${page}.title`)}
+                        href={`/information/${page}`}
+                      >
+                        {loc(`information.${page}.description`)}
                       </ListItem>
                     ))}
                   </ul>
@@ -182,26 +197,6 @@ const Navbar = () => {
           </NavigationMenu>
         </div>
         <div className='sm:flex items-center justify-center gap-1 hidden'>
-          {/* <OptionsMenuOld
-            options={options}
-            setOptions={setOptions}
-          />
-          <Button
-            variant='ghost'
-            size='icon'
-            onClick={() => {
-              setTheme(theme === 'dark' ? 'light' : 'dark')
-            }}
-          >
-            <Sun className='size-4 dark:opacity-0 translate-x-3/4 rotate-90 dark:rotate-0 transition-all' />
-            <Moon className='size-4 dark:opacity-100 opacity-0 -translate-x-3/4 dark:-rotate-90 rotate-0 transition-all' />
-          </Button>
-          <Button
-            variant='ghost'
-            asChild
-          >
-            <Link href='/login'>Log In</Link>
-          </Button> */}
           <Button
             variant='ghost'
             size='icon'
@@ -239,21 +234,48 @@ const Navbar = () => {
           )}
         >
           <div className='flex w-full items-center justify-center'>
-            <h1 className='font-bold w-full text-center uppercase'>Tools</h1>
+            <h2 className='uppercase text-muted-foreground text-xs'>
+              {loc('tools.title')}
+            </h2>
           </div>
           <div className='flex flex-col gap-1 items-center justify-center w-full'>
-            {tools.map((tool, i) => (
+            {tools.map((page, i) => (
               <Fragment key={i}>
                 <Link
-                  href={`/tools/${tool}`}
+                  href={`/tools/${page}`}
                   onClick={() => setMobileMenuOpened(false)}
                   className='w-full p-2 hover:bg-accent rounded'
                 >
                   <h2 className='font-semibold'>
-                    {loc(`tools.${tool}.title`)}
+                    {loc(`tools.${page}.title`)}
                   </h2>
                   <p className='text-sm text-muted-foreground'>
-                    {loc(`tools.${tool}.description`)}
+                    {loc(`tools.${page}.description`)}
+                  </p>
+                </Link>
+                {i !== tools.length - 1 && <Separator />}
+              </Fragment>
+            ))}
+          </div>
+          <Separator />
+          <div className='flex w-full items-center justify-center'>
+            <h2 className='uppercase text-muted-foreground text-xs'>
+              {loc('information.title')}
+            </h2>
+          </div>
+          <div className='flex flex-col gap-1 items-center justify-center w-full'>
+            {information.map((page, i) => (
+              <Fragment key={i}>
+                <Link
+                  href={`/information/${page}`}
+                  onClick={() => setMobileMenuOpened(false)}
+                  className='w-full p-2 hover:bg-accent rounded'
+                >
+                  <h2 className='font-semibold'>
+                    {loc(`information.${page}.title`)}
+                  </h2>
+                  <p className='text-sm text-muted-foreground'>
+                    {loc(`information.${page}.description`)}
                   </p>
                 </Link>
                 {i !== tools.length - 1 && <Separator />}
