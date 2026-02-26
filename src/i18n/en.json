@@ -27,6 +27,13 @@
       }
     }
   },
+  "information": {
+    "title": "Information",
+    "comic_viewer": {
+      "title": "Comic Viewer",
+      "description": "View all of the Project Sekai loading screen comics"
+    }
+  },
   "components": {
     "navbar": {
       "options_header": "Options",
@@ -61,9 +68,15 @@
     "form": {
       "min_3": "Must be at least 3 charcters.",
       "min_8": "Must be at least 8 charcters.",
+      "max_50": "Must not exceed 50 characters.",
+      "upper": "Must include at least one uppercase letter",
+      "lower": "Must include at least one lowercase letter",
+      "num": "Must include at least one number",
+      "symbol": "Must include at least one special character",
       "password_match": "Passwords must match.",
       "display_name": "Display name",
-      "confirm_password": "Confirm Password"
+      "confirm_password": "Confirm Password",
+      "username_validation": "Must only contain lowercase letters, numbers, and underscores"
     },
     "messages": {
       "username_taken": "This username is already taken"

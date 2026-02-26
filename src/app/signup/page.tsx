@@ -25,9 +25,25 @@ import { Spinner } from '@/components/ui/spinner'
 
 const signupSchema = z
   .object({
-    username: z.string().min(3, 'signup.form.min_3'),
+    username: z
+      .string()
+      .min(3, 'signup.form.min_3')
+      .refine((u) => {
+        const m = u.match(/[a-z0-9_]+/g)
+        return m && m.length === 1 && m[0].length === u.length
+      }, 'signup.form.username_validation'),
     display_name: z.string(),
-    password: z.string().min(8, 'signup.form.min_8'),
+    password: z
+      .string()
+      .min(8, 'signup.form.min_8')
+      .max(50, 'signup.form.max_50')
+      .refine((p) => p.match(/[A-Z]/), 'signup.form.upper')
+      .refine((p) => p.match(/[a-z]/), 'signup.form.lower')
+      .refine((p) => p.match(/[0-9]/), 'signup.form.num')
+      .refine(
+        (p) => p.match(/[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?`~]/),
+        'signup.form.symbol',
+      ),
     confirm_password: z.string(),
     turnstile_response: z.string().min(1, 'login.form.captcha'),
   })
