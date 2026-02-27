@@ -139,10 +139,10 @@ const Navbar = () => {
 
   return (
     <>
-      <div className='w-full p-2 flex items-center justify-between border-b border-border px-4 relative z-105'>
+      <div className='w-full p-2 grid grid-cols-[1fr_auto_1fr] items-center border-b border-border px-4 relative z-105'>
         <Link
           href='/'
-          className='flex gap-3 items-center justify-center px-2'
+          className='flex gap-3 items-center justify-center px-2 max-w-fit'
         >
           <Image
             src='/sbuga.webp'
@@ -196,7 +196,7 @@ const Navbar = () => {
             </NavigationMenuList>
           </NavigationMenu>
         </div>
-        <div className='sm:flex items-center justify-center gap-1 hidden'>
+        <div className='sm:flex items-center justify-center gap-1 hidden max-w-fit justify-self-end'>
           <Button
             variant='ghost'
             size='icon'
