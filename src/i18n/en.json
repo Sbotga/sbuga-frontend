@@ -39,7 +39,8 @@
     "title": "Information",
     "comic_viewer": {
       "title": "Comic Viewer",
-      "description": "View all of the Project Sekai loading screen comics"
+      "description": "View all of the Project Sekai loading screen comics",
+      "rank_available": "Available from user rank {from_rank} to {to_rank}"
     }
   },
   "components": {

@@ -10,6 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -137,21 +144,23 @@ const Pagination = ({
   )
 }
 
+interface comic {
+  title: string
+  image_url: string
+  from_user_rank: number
+  to_user_rank: number
+}
+
 const ComicViewer = () => {
   const { loc } = useTranslation()
   const [options, _] = useOptions()
   const [region, setRegion] = useState(options.default_region)
   const [loading, setLoading] = useState(true)
-  const [comics, setComics] = useState<
-    {
-      title: string
-      image_url: string
-      from_user_rank: number
-      to_user_rank: number
-    }[]
-  >([])
+  const [comics, setComics] = useState<comic[]>([])
   const [range, setRange] = useState(6)
   const [page, setPage] = useState(0)
+
+  const [selectedComic, setSelectedComic] = useState<comic | null>(null)
 
   useEffect(() => {
     const getComics = async () => {
@@ -178,103 +187,139 @@ const ComicViewer = () => {
   }, [region])
 
   return (
-    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 content-center'>
-      {loading ?
-        <Card
-          className='p-6 col-span-1 md:col-span-2 lg:col-span-3'
-          variant='main'
-        >
-          <Spinner className='size-8' />
-        </Card>
-      : <>
+    <>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 content-center'>
+        {loading ?
           <Card
-            className='col-span-1 md:col-span-2 lg:col-span-3 mb-2'
+            className='p-6 col-span-1 md:col-span-2 lg:col-span-3'
             variant='main'
           >
-            <CardHeader className='flex items-center justify-center'>
-              <div className='flex-1'>
-                <CardTitle className='font-header text-lg'>
-                  {loc('information.comic_viewer.title')}
-                </CardTitle>
-                <CardDescription>
-                  {loc('information.comic_viewer.description')}
-                </CardDescription>
-              </div>
-              <div className='flex flex-col items-end justify-center gap-1'>
-                <Label className='uppercase text-muted-foreground text-xs'>
-                  {loc('regions.title')}
-                </Label>
-                <RegionSelect
-                  value={region}
-                  onValueChange={(v) => setRegion(v as region)}
-                />
-              </div>
-            </CardHeader>
+            <Spinner className='size-8' />
           </Card>
-          {comics
-            .slice(page * range, Math.min((page + 1) * range, comics.length))
-            .map((comic, i) => (
-              <Card
-                key={i}
-                variant='main'
-                className='w-xs'
-              >
-                <CardHeader>
-                  <CardTitle>{comic.title}</CardTitle>
-                </CardHeader>
-                <CardContent className='flex flex-col items-center justify-center'>
-                  <Image
-                    src={comic.image_url}
-                    alt={comic.title}
-                    loading='eager'
-                    width={808}
-                    height={600}
-                    className='w-full'
-                  />
-                </CardContent>
-              </Card>
-            ))}
-          <div className='flex items-center justify-center mt-2 col-span-1 md:col-span-2 lg:col-span-3 flex-col gap-2'>
-            <p className='text-sm text-muted-foreground'>
-              Showing {page * range + 1}{' '}
-              {Math.min((page + 1) * range, comics.length) !==
-                page * range + 1 &&
-                `to ${Math.min((page + 1) * range, comics.length)}`}{' '}
-              of {comics.length}
-            </p>
-            <div className='flex items-center justify-center flex-col sm:flex-row gap-2'>
-              <Pagination
-                page={page}
-                setPage={setPage}
-                maxPages={Math.max(0, Math.ceil(comics.length / range) - 1)}
-              />
-              <div className='flex items-center justify-center gap-0 rounded-md shadow-xs shadow-shadow-color'>
-                <div className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-l-md text-sm font-medium shrink-0 outline-none bg-background h-9 px-4 py-2 border m-0'>
-                  {loc('pagination.items_per_page')}
+        : <>
+            <Card
+              className='col-span-1 md:col-span-2 lg:col-span-3 mb-2'
+              variant='main'
+            >
+              <CardHeader className='flex items-center justify-center'>
+                <div className='flex-1'>
+                  <CardTitle className='font-header text-lg'>
+                    {loc('information.comic_viewer.title')}
+                  </CardTitle>
+                  <CardDescription>
+                    {loc('information.comic_viewer.description')}
+                  </CardDescription>
                 </div>
-                <Select
-                  value={`${range}`}
-                  onValueChange={(v) => setRange(parseInt(v))}
+                <div className='flex flex-col items-end justify-center gap-1'>
+                  <Label className='uppercase text-muted-foreground text-xs'>
+                    {loc('regions.title')}
+                  </Label>
+                  <RegionSelect
+                    value={region}
+                    onValueChange={(v) => setRegion(v as region)}
+                  />
+                </div>
+              </CardHeader>
+            </Card>
+            {comics
+              .slice(page * range, Math.min((page + 1) * range, comics.length))
+              .map((comic, i) => (
+                <Card
+                  key={i}
+                  variant='main'
+                  className='w-xs hover:scale-101 transition-all'
+                  onClick={() => setSelectedComic(comic)}
                 >
-                  <SelectTrigger className='bg-background border-border focus-visible:border-border border-l-0 rounded-l-none focus-visible:ring-0 focus-visible:outline-0'>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className='bg-background'>
-                    <SelectItem value='3'>3</SelectItem>
-                    <SelectItem value='6'>6</SelectItem>
-                    <SelectItem value='9'>9</SelectItem>
-                    <SelectItem value='12'>12</SelectItem>
-                    <SelectItem value='18'>18</SelectItem>
-                    <SelectItem value='24'>24</SelectItem>
-                    <SelectItem value='30'>30</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <CardHeader>
+                    <CardTitle>{comic.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className='flex flex-col items-center justify-center'>
+                    <Image
+                      src={comic.image_url}
+                      alt={comic.title}
+                      loading='eager'
+                      width={808}
+                      height={600}
+                      className='w-full'
+                    />
+                  </CardContent>
+                </Card>
+              ))}
+            <div className='flex items-center justify-center mt-2 col-span-1 md:col-span-2 lg:col-span-3 flex-col gap-2'>
+              <p className='text-sm text-muted-foreground'>
+                Showing {page * range + 1}{' '}
+                {Math.min((page + 1) * range, comics.length) !==
+                  page * range + 1 &&
+                  `to ${Math.min((page + 1) * range, comics.length)}`}{' '}
+                of {comics.length}
+              </p>
+              <div className='flex items-center justify-center flex-col sm:flex-row gap-2'>
+                <Pagination
+                  page={page}
+                  setPage={setPage}
+                  maxPages={Math.max(0, Math.ceil(comics.length / range) - 1)}
+                />
+                <div className='flex items-center justify-center gap-0 rounded-md shadow-xs shadow-shadow-color'>
+                  <div className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-l-md text-sm font-medium shrink-0 outline-none bg-background h-9 px-4 py-2 border m-0'>
+                    {loc('pagination.items_per_page')}
+                  </div>
+                  <Select
+                    value={`${range}`}
+                    onValueChange={(v) => setRange(parseInt(v))}
+                  >
+                    <SelectTrigger className='bg-background border-border focus-visible:border-border border-l-0 rounded-l-none focus-visible:ring-0 focus-visible:outline-0'>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className='bg-background'>
+                      <SelectItem value='3'>3</SelectItem>
+                      <SelectItem value='6'>6</SelectItem>
+                      <SelectItem value='9'>9</SelectItem>
+                      <SelectItem value='12'>12</SelectItem>
+                      <SelectItem value='18'>18</SelectItem>
+                      <SelectItem value='24'>24</SelectItem>
+                      <SelectItem value='30'>30</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
-          </div>
-        </>
-      }
-    </div>
+          </>
+        }
+      </div>
+      {/* {selectedComic && (
+        <div className='fixed left-0 right-0 bottom-0 top-0 bg-foreground/20 flex items-center justify-center'>
+          hi
+        </div>
+      )} */}
+      <Dialog
+        open={selectedComic !== null}
+        onOpenChange={(open) => {
+          if (!open) setSelectedComic(null)
+        }}
+      >
+        {selectedComic && (
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{selectedComic.title}</DialogTitle>
+              <DialogDescription>
+                {loc('information.comic_viewer.rank_available', {
+                  from_rank: selectedComic.from_user_rank,
+                  to_rank: selectedComic.to_user_rank,
+                })}
+              </DialogDescription>
+            </DialogHeader>
+            <Image
+              src={selectedComic.image_url}
+              alt={selectedComic.title}
+              loading='eager'
+              width={808}
+              height={600}
+              className='w-full'
+            />
+          </DialogContent>
+        )}
+      </Dialog>
+    </>
   )
 }
 

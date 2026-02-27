@@ -139,157 +139,158 @@ const Navbar = () => {
 
   return (
     <>
-      <div className='w-full p-2 grid sm:grid-cols-[1fr_auto_1fr] grid-cols-2 items-center border-b border-border px-4 relative z-105'>
-        <Link
-          href='/'
-          className='flex gap-3 items-center justify-center px-2 max-w-fit'
-        >
-          <Image
-            src='/sbuga.webp'
-            width={100}
-            height={100}
-            alt='Sbuga'
-            className='size-7.5'
-          />
-          <h2 className='font-bold font-header'>Sbuga!</h2>
-        </Link>
-        <div className='sm:flex items-center justify-center hidden'>
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>
-                  {loc('tools.title')}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className='grid w-[400px] gap-2'>
-                    {tools.map((page, i) => (
-                      <ListItem
-                        key={i}
-                        title={loc(`tools.${page}.title`)}
-                        href={`/tools/${page}`}
-                      >
-                        {loc(`tools.${page}.description`)}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>
-                  {loc('information.title')}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className='grid w-[400px] gap-2'>
-                    {information.map((page, i) => (
-                      <ListItem
-                        key={i}
-                        title={loc(`information.${page}.title`)}
-                        href={`/information/${page}`}
-                      >
-                        {loc(`information.${page}.description`)}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-        </div>
-        <div className='sm:flex items-center justify-center gap-1 hidden max-w-fit justify-self-end'>
-          <Button
-            variant='ghost'
-            size='icon'
-            onClick={() => setMenuOpened((p) => !p)}
+      <div className='sticky top-0 w-full z-20'>
+        <div className='w-full h-full relative p-2 grid sm:grid-cols-[1fr_auto_1fr] grid-cols-2 items-center border-b border-border px-4 bg-background'>
+          <Link
+            href='/'
+            className='flex gap-3 items-center justify-center px-2 max-w-fit'
           >
-            {menuOpened ?
-              <XIcon className='size-4' />
-            : <Menu className='size-4' />}
-          </Button>
-        </div>
-        {menuOpened && (
-          <div className='hiddem sm:flex absolute top-full min-w-xs p-3 bg-background right-0 m-3 border border-border rounded z-200'>
+            <Image
+              src='/sbuga.webp'
+              width={100}
+              height={100}
+              alt='Sbuga'
+              className='size-7.5'
+            />
+            <h2 className='font-bold font-header'>Sbuga!</h2>
+          </Link>
+          <div className='sm:flex items-center justify-center hidden'>
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>
+                    {loc('tools.title')}
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className='grid w-[400px] gap-2'>
+                      {tools.map((page, i) => (
+                        <ListItem
+                          key={i}
+                          title={loc(`tools.${page}.title`)}
+                          href={`/tools/${page}`}
+                        >
+                          {loc(`tools.${page}.description`)}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>
+                    {loc('information.title')}
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className='grid w-[400px] gap-2'>
+                      {information.map((page, i) => (
+                        <ListItem
+                          key={i}
+                          title={loc(`information.${page}.title`)}
+                          href={`/information/${page}`}
+                        >
+                          {loc(`information.${page}.description`)}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
+          <div className='sm:flex items-center justify-center gap-1 hidden max-w-fit justify-self-end'>
+            <Button
+              variant='ghost'
+              size='icon'
+              onClick={() => setMenuOpened((p) => !p)}
+            >
+              {menuOpened ?
+                <XIcon className='size-4' />
+              : <Menu className='size-4' />}
+            </Button>
+          </div>
+          {menuOpened && (
+            <div className='hiddem sm:flex absolute top-full min-w-xs p-3 bg-background right-0 m-3 border border-border rounded z-200'>
+              <OptionsMenu
+                options={options}
+                setOptions={setOptions}
+                theme={theme || 'system'}
+                setTheme={setTheme}
+                setMenuOpened={setMenuOpened}
+              />
+            </div>
+          )}
+          <div className='flex sm:hidden justify-self-end'>
+            <Button
+              variant='ghost'
+              size='icon'
+              onClick={() => setMobileMenuOpened((p) => !p)}
+            >
+              <Menu className='size-4' />
+            </Button>
+          </div>
+          <div
+            className={twMerge(
+              'absolute top-full left-0 right-0 w-full flex items-center justify-center flex-col gap-3 p-3 bg-background border-t border-b border-border overflow-hidden',
+              !mobileMenuOpened && 'hidden',
+            )}
+          >
+            <div className='flex w-full items-center justify-center'>
+              <h2 className='uppercase text-muted-foreground text-xs'>
+                {loc('tools.title')}
+              </h2>
+            </div>
+            <div className='flex flex-col gap-1 items-center justify-center w-full'>
+              {tools.map((page, i) => (
+                <Fragment key={i}>
+                  <Link
+                    href={`/tools/${page}`}
+                    onClick={() => setMobileMenuOpened(false)}
+                    className='w-full p-2 hover:bg-accent rounded'
+                  >
+                    <h2 className='font-semibold'>
+                      {loc(`tools.${page}.title`)}
+                    </h2>
+                    <p className='text-sm text-muted-foreground'>
+                      {loc(`tools.${page}.description`)}
+                    </p>
+                  </Link>
+                  {i !== tools.length - 1 && <Separator />}
+                </Fragment>
+              ))}
+            </div>
+            <Separator />
+            <div className='flex w-full items-center justify-center'>
+              <h2 className='uppercase text-muted-foreground text-xs'>
+                {loc('information.title')}
+              </h2>
+            </div>
+            <div className='flex flex-col gap-1 items-center justify-center w-full'>
+              {information.map((page, i) => (
+                <Fragment key={i}>
+                  <Link
+                    href={`/information/${page}`}
+                    onClick={() => setMobileMenuOpened(false)}
+                    className='w-full p-2 hover:bg-accent rounded'
+                  >
+                    <h2 className='font-semibold'>
+                      {loc(`information.${page}.title`)}
+                    </h2>
+                    <p className='text-sm text-muted-foreground'>
+                      {loc(`information.${page}.description`)}
+                    </p>
+                  </Link>
+                  {i !== tools.length - 1 && <Separator />}
+                </Fragment>
+              ))}
+            </div>
+            <Separator />
             <OptionsMenu
               options={options}
               setOptions={setOptions}
               theme={theme || 'system'}
               setTheme={setTheme}
-              setMenuOpened={setMenuOpened}
+              setMenuOpened={setMobileMenuOpened}
             />
           </div>
-        )}
-        <div className='flex sm:hidden justify-self-end'>
-          <Button
-            variant='ghost'
-            size='icon'
-            onClick={() => setMobileMenuOpened((p) => !p)}
-          >
-            <Menu className='size-4' />
-          </Button>
-        </div>
-        <div
-          className={twMerge(
-            'absolute top-full left-0 right-0 w-full flex items-center justify-center flex-col gap-3 p-3 bg-background border-t border-b border-border overflow-hidden',
-            !mobileMenuOpened && 'hidden',
-          )}
-        >
-          <div className='flex w-full items-center justify-center'>
-            <h2 className='uppercase text-muted-foreground text-xs'>
-              {loc('tools.title')}
-            </h2>
-          </div>
-          <div className='flex flex-col gap-1 items-center justify-center w-full'>
-            {tools.map((page, i) => (
-              <Fragment key={i}>
-                <Link
-                  href={`/tools/${page}`}
-                  onClick={() => setMobileMenuOpened(false)}
-                  className='w-full p-2 hover:bg-accent rounded'
-                >
-                  <h2 className='font-semibold'>
-                    {loc(`tools.${page}.title`)}
-                  </h2>
-                  <p className='text-sm text-muted-foreground'>
-                    {loc(`tools.${page}.description`)}
-                  </p>
-                </Link>
-                {i !== tools.length - 1 && <Separator />}
-              </Fragment>
-            ))}
-          </div>
-          <Separator />
-          <div className='flex w-full items-center justify-center'>
-            <h2 className='uppercase text-muted-foreground text-xs'>
-              {loc('information.title')}
-            </h2>
-          </div>
-          <div className='flex flex-col gap-1 items-center justify-center w-full'>
-            {information.map((page, i) => (
-              <Fragment key={i}>
-                <Link
-                  href={`/information/${page}`}
-                  onClick={() => setMobileMenuOpened(false)}
-                  className='w-full p-2 hover:bg-accent rounded'
-                >
-                  <h2 className='font-semibold'>
-                    {loc(`information.${page}.title`)}
-                  </h2>
-                  <p className='text-sm text-muted-foreground'>
-                    {loc(`information.${page}.description`)}
-                  </p>
-                </Link>
-                {i !== tools.length - 1 && <Separator />}
-              </Fragment>
-            ))}
-          </div>
-          <Separator />
-          <OptionsMenu
-            options={options}
-            setOptions={setOptions}
-            theme={theme || 'system'}
-            setTheme={setTheme}
-            setMenuOpened={setMobileMenuOpened}
-          />
         </div>
       </div>
       {mobileMenuOpened && (
