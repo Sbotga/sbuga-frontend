@@ -2,6 +2,14 @@
   "general": {
     "loading": "Loading..."
   },
+  "pagination": {
+    "previous": "Previous",
+    "prev": "Prev",
+    "next": "Next",
+    "first": "First",
+    "last": "Last",
+    "items_per_page": "Items per page"
+  },
   "regions": {
     "title": "Region",
     "en": "EN (Global)",

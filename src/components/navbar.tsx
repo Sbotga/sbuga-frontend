@@ -139,7 +139,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className='w-full p-2 grid grid-cols-[1fr_auto_1fr] items-center border-b border-border px-4 relative z-105'>
+      <div className='w-full p-2 grid sm:grid-cols-[1fr_auto_1fr] grid-cols-2 items-center border-b border-border px-4 relative z-105'>
         <Link
           href='/'
           className='flex gap-3 items-center justify-center px-2 max-w-fit'
@@ -218,7 +218,7 @@ const Navbar = () => {
             />
           </div>
         )}
-        <div className='flex sm:hidden'>
+        <div className='flex sm:hidden justify-self-end'>
           <Button
             variant='ghost'
             size='icon'
