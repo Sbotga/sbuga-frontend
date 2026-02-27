@@ -10,7 +10,9 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
       <Navbar />
       <div className='flex flex-1 items-center justify-center flex-col relative bg-secondary'>
         <Background />
-        <div className='z-10 py-5'>{children}</div>
+        <div className='z-10 py-5 w-full h-full flex items-center justify-center flex-col'>
+          {children}
+        </div>
         {/* <Sidebar
           variant='sidebar'
           side='right'

@@ -18,6 +18,14 @@
   "languages": {
     "en": "English"
   },
+  "difficulties": {
+    "easy": "Easy",
+    "normal": "Normal",
+    "hard": "Hard",
+    "expert": "Expert",
+    "master": "Master",
+    "append": "Append"
+  },
   "tools": {
     "title": "Tools",
     "why_inappropriate": {
@@ -33,6 +41,12 @@
         "issue_single": "{issues} issue",
         "issue_plural": "{issues} issues"
       }
+    },
+    "chart_viewer": {
+      "title": "Chart Viewer",
+      "description": "View the chart of a Project Sekai song",
+      "search": "Search",
+      "difficulty": "difficulty"
     }
   },
   "information": {
@@ -41,6 +55,10 @@
       "title": "Comic Viewer",
       "description": "View all of the Project Sekai loading screen comics",
       "rank_available": "Available from user rank {from_rank} to {to_rank}"
+    },
+    "stamp_viewer": {
+      "title": "Stamp Viewer",
+      "description": "View all of the Project Sekai stamps"
     }
   },
   "components": {
