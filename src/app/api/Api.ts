@@ -74,6 +74,18 @@ export interface LoginBody {
   turnstile_response: string
 }
 
+/** MusicSearchBody */
+export interface MusicSearchBody {
+  /** Query */
+  query: string
+  /** Region */
+  region?: 'en' | 'jp' | null
+  /** Difficulties */
+  difficulties?:
+    | ('easy' | 'normal' | 'hard' | 'expert' | 'master' | 'append')[]
+    | null
+}
+
 /** SignupBody */
 export interface SignupBody {
   /** Display Name */
@@ -765,7 +777,7 @@ export class Api<
       }),
 
     /**
-     * @description Returns the current PJSK event data including the top 100 leaderboard and ranking borders. `event_status` is one of `going`, `counting`, or `end`. Data is cached for **5 minutes** - `next_available_update` indicates when fresh data will be available. If there is no active event, `event_id` will be `null` and no leaderboard or border data is returned.
+     * @description Returns the current PJSK event data including the top 100 leaderboard and ranking borders. `event_status` is one of `going`, `counting`, or `end`. Data is cached for **5 minutes** - `next_available_update` indicates when fresh data will be available. If there is no active event, `event_id` will be `null` and no leaderboard or border data is returned. If the request fails but cached data exists, the response will include a `cached_data` key with the last successful result.
      *
      * @tags PJSK Data
      * @name CurrentEventApiPjskDataCurrentEventGet
@@ -784,7 +796,7 @@ export class Api<
         {
           /** @example "detail_code" */
           detail?: string
-        }
+        } | void
       >({
         path: `/api/pjsk_data/current_event`,
         method: 'GET',
@@ -794,7 +806,7 @@ export class Api<
       }),
 
     /**
-     * @description Returns the current PJSK ranked season data including the top 100 leaderboard. `season_status` is one of `going` or `end`. Data is cached for **5 minutes** - `next_available_update` indicates when fresh data will be available. If there is no active season, `season_id` will be `null` and no leaderboard data is returned.
+     * @description Returns the current PJSK ranked season data including the top 100 leaderboard. `season_status` is one of `going` or `end`. Data is cached for **5 minutes** - `next_available_update` indicates when fresh data will be available. If there is no active season, `season_id` will be `null` and no leaderboard data is returned. If the request fails but cached data exists, the response will include a `cached_data` key with the last successful result.
      *
      * @tags PJSK Data
      * @name CurrentRankedApiPjskDataCurrentRankedGet
@@ -813,11 +825,106 @@ export class Api<
         {
           /** @example "detail_code" */
           detail?: string
-        }
+        } | void
       >({
         path: `/api/pjsk_data/current_ranked`,
         method: 'GET',
         query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Returns a simplified list of all musics for a given region, including only ID, title, difficulties, and jacket URL.
+     *
+     * @tags PJSK Data
+     * @name GetMusicsSimpleApiPjskDataMusicsSimpleGet
+     * @summary Get musics (simple)
+     * @request GET:/api/pjsk_data/musics/simple
+     */
+    getMusicsSimpleApiPjskDataMusicsSimpleGet: (
+      query: {
+        /** Region */
+        region: 'en' | 'jp'
+        /**
+         * Image Type
+         * @default "webp"
+         */
+        image_type?: 'webp' | 'png'
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/pjsk_data/musics/simple`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Returns a compiled list of all musics for a given region, including vocals, difficulties, tags, collaboration, and original video.
+     *
+     * @tags PJSK Data
+     * @name GetMusicsApiPjskDataMusicsGet
+     * @summary Get musics
+     * @request GET:/api/pjsk_data/musics
+     */
+    getMusicsApiPjskDataMusicsGet: (
+      query: {
+        /** Region */
+        region: 'en' | 'jp'
+        /**
+         * Image Type
+         * @default "webp"
+         */
+        image_type?: 'webp' | 'png'
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/pjsk_data/musics`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Fuzzy search musics by title. Returns a list of matching music IDs sorted by relevance (closest first). `region` is optional — if omitted, searches across all regions. `difficulties` optionally filters to only songs that have ALL specified difficulties.
+     *
+     * @tags PJSK Data
+     * @name SearchMusicsApiPjskDataMusicsSearchPost
+     * @summary Search musics
+     * @request POST:/api/pjsk_data/musics/search
+     */
+    searchMusicsApiPjskDataMusicsSearchPost: (
+      data: MusicSearchBody,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/pjsk_data/musics/search`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
         format: 'json',
         ...params,
       }),
