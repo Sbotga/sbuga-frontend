@@ -2,6 +2,7 @@
 
 import Pagination from '@/components/pagination'
 import RegionSelect from '@/components/region-select'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -37,8 +38,9 @@ import useTranslation from '@/hooks/use-translation'
 import { apiClient } from '@/lib/api-client'
 import { region, regions } from '@/lib/consts'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Search } from 'lucide-react'
-import Image from 'next/image'
+import { Search, Share } from 'lucide-react'
+import NextImage from 'next/image'
+import { version } from 'node:punycode'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
@@ -55,7 +57,7 @@ const difficulties = [
 const formSchema = z.object({
   search: z.string(),
   region: z.literal(regions),
-  difficulty: z.optional(z.literal(difficulties)),
+  difficulty: z.literal(difficulties),
 })
 
 interface song {
@@ -77,7 +79,7 @@ const ChartViewer = () => {
 
   const [selectedSong, setSelectedSong] = useState<song | null>(null)
   const [chartLoading, setChartLoading] = useState(false)
-  const [chart, setChart] = useState<any | null>(null)
+  const [chart, setChart] = useState<Blob | null>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -130,7 +132,7 @@ const ChartViewer = () => {
           {
             body: JSON.stringify({
               music_id: selectedSong.id,
-              difficulty: 'master',
+              difficulty: form.getValues('difficulty'),
               region: form.getValues('region'),
             }),
             method: 'POST',
@@ -138,7 +140,8 @@ const ChartViewer = () => {
           { unprotected: true },
         )
 
-        setChart(await res.json())
+        const b = await res.blob()
+        setChart(b)
       } finally {
         setChartLoading(false)
       }
@@ -166,6 +169,8 @@ const ChartViewer = () => {
 
       const { songs: allSongs } = await res.json()
       setSongs(allSongs)
+      const i = allSongs.indexOf(selectedSong ?? allSongs[0])
+      setPage(Math.floor(i / range) + 1)
     } finally {
       setLoading(false)
     }
@@ -243,7 +248,6 @@ const ChartViewer = () => {
               </div>
               <div className='flex items-end justify-center gap-1 w-full'>
                 <FormField
-                  control={form.control}
                   name='difficulty'
                   render={({ field }) => (
                     <FormItem className='flex flex-col flex-1 items-start justify-center'>
@@ -263,7 +267,7 @@ const ChartViewer = () => {
                           >
                             <SelectValue>
                               {loc(
-                                `difficulties.${form.getValues('difficulty') as (typeof difficulties)[number]}`,
+                                `difficulties.${form.getValues('difficulty')}`,
                               )}
                             </SelectValue>
                           </SelectTrigger>
@@ -295,11 +299,11 @@ const ChartViewer = () => {
           <Spinner className='size-8' />
         </Card>
       : <>
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 content-center gap-1'>
+          <div className='flex gap-1 items-center justify-center flex-wrap max-w-full w-121 md:w-182 lg:w-243'>
             {songs.slice(page * range, (page + 1) * range).map((song, i) => (
               <Card
                 key={i}
-                className='w-60 gap-1 hover:scale-101 transition-all'
+                className='sm:w-60 gap-1 hover:scale-101 transition-[scale]'
                 variant='main'
                 onClick={() => setSelectedSong(song)}
               >
@@ -307,12 +311,12 @@ const ChartViewer = () => {
                   <CardTitle>{song.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Image
+                  <NextImage
                     src={song.jacket_url}
                     alt={song.title}
                     width={800}
                     height={800}
-                    className='w-full rounded-md border-2'
+                    className='w-full max-w-80 rounded-md border-2'
                   />
                 </CardContent>
               </Card>
@@ -343,13 +347,37 @@ const ChartViewer = () => {
             }}
           >
             {selectedSong && (
-              <DialogContent>
-                <DialogHeader>
+              <DialogContent className='max-w-none! w-max min-w-80 min-h-40'>
+                <DialogHeader className='flex items-center justify-start gap-4 flex-row mb-3'>
                   <DialogTitle>{selectedSong.title}</DialogTitle>
+                  <Badge
+                    variant='default'
+                    className='rounded-md'
+                  >
+                    {loc(`difficulties.${form.getValues('difficulty')}`)}
+                  </Badge>
                 </DialogHeader>
-                {chartLoading ?
-                  <Spinner />
-                : <div>{JSON.stringify(chart)}</div>}
+                {chartLoading || !chart ?
+                  <div className='w-2xl aspect-video bg-accent flex items-center justify-center rounded-sm flex-col gap-4'>
+                    <p>We're generating your chart...</p>
+                    <Spinner className='size-5' />
+                  </div>
+                : <div className='relative'>
+                    <img
+                      className='w-2xl rounded-sm'
+                      src={URL.createObjectURL(chart)}
+                      alt={selectedSong.title}
+                    />
+                    <Button
+                      size='icon'
+                      className='absolute top-3 right-3 border-none cursor-pointer'
+                      variant='outline'
+                      onClick={() => window.open(URL.createObjectURL(chart))}
+                    >
+                      <Share />
+                    </Button>
+                  </div>
+                }
               </DialogContent>
             )}
           </Dialog>
