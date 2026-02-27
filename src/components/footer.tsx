@@ -19,7 +19,7 @@ const links = [
       />
     ),
     name: 'discord',
-    href: 'https://discord.com/',
+    href: 'https://discord.gg/Cdjs8c3SRy',
   },
   {
     icon: () => (
