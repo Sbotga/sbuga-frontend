@@ -8,7 +8,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  NavigationMenuViewport,
 } from './ui/navigation-menu'
 import { Button } from './ui/button'
 import { Menu, Moon, Sun, XIcon } from 'lucide-react'
@@ -16,6 +15,7 @@ import { useTheme } from 'next-themes'
 import { Label } from './ui/label'
 import { Options, useOptions } from '@/context/OptionsContext'
 import { Fragment, useState } from 'react'
+import type { ComponentPropsWithoutRef } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Separator } from './ui/separator'
 import Image from 'next/image'
@@ -33,8 +33,31 @@ import {
 } from './ui/select'
 import { useAuth } from '@/context/AuthContext'
 
+const navigation = {
+  information: [
+    'comic_viewer',
+    //'stamp_viewer',
+  ],
+  tools: ['why_inappropriate', 'chart_viewer'],
+} as const
+
+type Navigation = typeof navigation
+type NavKey = keyof Navigation
+type NavPage<K extends NavKey> = Navigation[K][number]
+
+function mkKey<
+  K extends NavKey,
+  P extends NavPage<K>,
+  F extends 'title' | 'description',
+>(k: K, p: P, f: F) {
+  return `${k}.${p}.${f}` as `${K}.${P}.${F}`
+}
+
+type LocFn = ReturnType<typeof useTranslation>['loc']
+type LocKey = Parameters<LocFn>[0]
+
 const tools = ['why_inappropriate'] as const
-const information = ['comic_viewer'] as const
+const information = ['comic_viewer', 'stamp_viewer'] as const
 
 const OptionsMenu = ({
   options,
@@ -157,42 +180,9 @@ const Navbar = () => {
           <div className='sm:flex items-center justify-center hidden'>
             <NavigationMenu>
               <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>
-                    {loc('tools.title')}
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className='grid w-[400px] gap-2'>
-                      {tools.map((page, i) => (
-                        <ListItem
-                          key={i}
-                          title={loc(`tools.${page}.title`)}
-                          href={`/tools/${page}`}
-                        >
-                          {loc(`tools.${page}.description`)}
-                        </ListItem>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>
-                    {loc('information.title')}
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className='grid w-[400px] gap-2'>
-                      {information.map((page, i) => (
-                        <ListItem
-                          key={i}
-                          title={loc(`information.${page}.title`)}
-                          href={`/information/${page}`}
-                        >
-                          {loc(`information.${page}.description`)}
-                        </ListItem>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
+                {(Object.keys(navigation) as NavKey[]).map((k) =>
+                  renderNavGroup(k),
+                )}
               </NavigationMenuList>
             </NavigationMenu>
           </div>
@@ -295,11 +285,35 @@ const Navbar = () => {
       </div>
       {mobileMenuOpened && (
         <div
-          className='h-screen w-screen left-0 absolute z-90'
+          className='h-screen w-screen left-0 absolute z-19'
           onClick={() => setMobileMenuOpened(false)}
         />
       )}
     </>
+  )
+}
+
+function renderNavGroup<K extends NavKey>(k: K) {
+  const { loc } = useTranslation()
+  return (
+    <NavigationMenuItem key={k as string}>
+      <NavigationMenuTrigger triggerMode='click'>
+        {loc(`${k}.title` as LocKey)}
+      </NavigationMenuTrigger>
+      <NavigationMenuContent triggerMode='click'>
+        <ul className='grid w-[400px] gap-2'>
+          {navigation[k].map((page) => (
+            <ListItem
+              key={String(page)}
+              title={loc(`${k}.${page}.title` as LocKey)}
+              href={`/${k}/${page}`}
+            >
+              {loc(`${k}.${page}.description` as LocKey)}
+            </ListItem>
+          ))}
+        </ul>
+      </NavigationMenuContent>
+    </NavigationMenuItem>
   )
 }
 
@@ -308,7 +322,7 @@ const ListItem = ({
   children,
   href,
   ...props
-}: React.ComponentPropsWithoutRef<'li'> & { href: string }) => {
+}: ComponentPropsWithoutRef<'li'> & { href: string }) => {
   return (
     <li {...props}>
       <NavigationMenuLink asChild>

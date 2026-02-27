@@ -1,5 +1,6 @@
 'use client'
 
+import Pagination from '@/components/pagination'
 import RegionSelect from '@/components/region-select'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
@@ -40,110 +41,6 @@ import {
 import Image from 'next/image'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
-const Pagination = ({
-  page,
-  maxPages,
-  setPage,
-}: {
-  page: number
-  maxPages: number
-  setPage: Dispatch<SetStateAction<number>>
-}) => {
-  const isMobile = useIsMobile()
-  const { loc } = useTranslation()
-
-  const pagesToShow = new Set<number>()
-  if (!isMobile) {
-    pagesToShow.add(0)
-    pagesToShow.add(maxPages)
-  }
-  pagesToShow.add(page)
-  if (page > 0) pagesToShow.add(page - 1)
-  if (page < maxPages) pagesToShow.add(page + 1)
-
-  const minPage = Math.min(...pagesToShow)
-  const maxPage = Math.max(...pagesToShow)
-  if (maxPage - minPage + 1 <= 5) {
-    for (let p = minPage; p <= maxPage; p++) {
-      pagesToShow.add(p)
-    }
-  }
-
-  const sortedPages = Array.from(pagesToShow).sort((a, b) => a - b)
-
-  const buttons = []
-  for (let i = 0; i < sortedPages.length; i++) {
-    const pageNum = sortedPages[i]
-
-    if (!isMobile && i > 0 && sortedPages[i - 1] < pageNum - 1) {
-      buttons.push(
-        <Button
-          key={`ellipsis-${pageNum}`}
-          variant='outline'
-          className='hover:bg-background aspect-square sm:aspect-auto'
-        >
-          ...
-        </Button>,
-      )
-    }
-
-    buttons.push(
-      <Button
-        key={`page-${pageNum}`}
-        variant={page === pageNum ? 'default' : 'outline'}
-        className='cursor-pointer aspect-square sm:aspect-auto'
-        onClick={() => setPage(pageNum)}
-      >
-        {pageNum + 1}
-      </Button>,
-    )
-  }
-
-  return (
-    <div className='flex items-center justify-center gap-1'>
-      <ButtonGroup>
-        <Button
-          variant='outline'
-          className='cursor-pointer'
-          onClick={() => setPage(0)}
-        >
-          <ChevronsLeft />
-          <span className='hidden sm:inline'>{loc('pagination.first')}</span>
-        </Button>
-        <Button
-          disabled={page === 0}
-          variant='outline'
-          className='disabled:opacity-100 disabled:bg-muted disabled:text-muted-foreground cursor-pointer'
-          onClick={() => setPage((p) => p - 1)}
-        >
-          <ChevronLeft />
-          <span className='hidden sm:inline'>{loc('pagination.prev')}</span>
-        </Button>
-      </ButtonGroup>
-      <ButtonGroup>{buttons}</ButtonGroup>
-      <ButtonGroup>
-        <Button
-          disabled={page === maxPages}
-          variant='outline'
-          className='disabled:opacity-100 disabled:bg-muted disabled:text-muted-foreground cursor-pointer'
-          onClick={() => setPage((p) => p + 1)}
-        >
-          <span className='hidden sm:inline'>{loc('pagination.next')}</span>
-          <ChevronRight />
-        </Button>
-        <Button
-          variant='outline'
-          className='cursor-pointer'
-          onClick={() => setPage(maxPages)}
-        >
-          <span className='hidden sm:inline'>{loc('pagination.last')}</span>
-          <ChevronsRight />
-        </Button>
-      </ButtonGroup>
-    </div>
-  )
-}
-
 interface comic {
   title: string
   image_url: string
@@ -166,13 +63,17 @@ const ComicViewer = () => {
     const getComics = async () => {
       try {
         setLoading(true)
-        const res = await apiClient('/api/information/get_comics', {
-          method: 'POST',
-          body: JSON.stringify({
-            region,
-            image_type: 'webp',
-          }),
-        })
+        const res = await apiClient(
+          '/api/information/get_comics',
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              region,
+              image_type: 'webp',
+            }),
+          },
+          { unprotected: true },
+        )
 
         if (res.ok) {
           const { comics: allComics } = await res.json()
@@ -253,35 +154,15 @@ const ComicViewer = () => {
                   `to ${Math.min((page + 1) * range, comics.length)}`}{' '}
                 of {comics.length}
               </p>
-              <div className='flex items-center justify-center flex-col sm:flex-row gap-2'>
-                <Pagination
-                  page={page}
-                  setPage={setPage}
-                  maxPages={Math.max(0, Math.ceil(comics.length / range) - 1)}
-                />
-                <div className='flex items-center justify-center gap-0 rounded-md shadow-xs shadow-shadow-color'>
-                  <div className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-l-md text-sm font-medium shrink-0 outline-none bg-background h-9 px-4 py-2 border m-0'>
-                    {loc('pagination.items_per_page')}
-                  </div>
-                  <Select
-                    value={`${range}`}
-                    onValueChange={(v) => setRange(parseInt(v))}
-                  >
-                    <SelectTrigger className='bg-background border-border focus-visible:border-border border-l-0 rounded-l-none focus-visible:ring-0 focus-visible:outline-0'>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className='bg-background'>
-                      <SelectItem value='3'>3</SelectItem>
-                      <SelectItem value='6'>6</SelectItem>
-                      <SelectItem value='9'>9</SelectItem>
-                      <SelectItem value='12'>12</SelectItem>
-                      <SelectItem value='18'>18</SelectItem>
-                      <SelectItem value='24'>24</SelectItem>
-                      <SelectItem value='30'>30</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+
+              <Pagination
+                page={page}
+                setPage={setPage}
+                maxPages={Math.max(0, Math.ceil(comics.length / range) - 1)}
+                range={range}
+                setRange={setRange}
+                itemCountList={[3, 6, 9, 12, 18, 24, 30]}
+              />
             </div>
           </>
         }

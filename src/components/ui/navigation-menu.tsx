@@ -67,13 +67,21 @@ const navigationMenuTriggerStyle = cva(
 function NavigationMenuTrigger({
   className,
   children,
+  triggerMode = 'hover',
   ...props
-}: React.ComponentProps<typeof NavigationMenuPrimitive.Trigger>) {
+}: React.ComponentProps<typeof NavigationMenuPrimitive.Trigger> & {
+  triggerMode?: 'click' | 'hover'
+}) {
   return (
     <NavigationMenuPrimitive.Trigger
       data-slot='navigation-menu-trigger'
       className={cn(navigationMenuTriggerStyle(), 'group', className)}
       {...props}
+      {...(triggerMode === 'click' && {
+        onPointerEnter: (event) => event.preventDefault(),
+        onPointerMove: (event) => event.preventDefault(),
+        onPointerLeave: (event) => event.preventDefault(),
+      })}
     >
       {children}{' '}
       <ChevronDownIcon
@@ -86,8 +94,11 @@ function NavigationMenuTrigger({
 
 function NavigationMenuContent({
   className,
+  triggerMode = 'hover',
   ...props
-}: React.ComponentProps<typeof NavigationMenuPrimitive.Content>) {
+}: React.ComponentProps<typeof NavigationMenuPrimitive.Content> & {
+  triggerMode?: 'click' | 'hover'
+}) {
   return (
     <NavigationMenuPrimitive.Content
       data-slot='navigation-menu-content'
@@ -97,6 +108,11 @@ function NavigationMenuContent({
         className,
       )}
       {...props}
+      {...(triggerMode === 'click' && {
+        onPointerEnter: (event) => event.preventDefault(),
+        onPointerMove: (event) => event.preventDefault(),
+        onPointerLeave: (event) => event.preventDefault(),
+      })}
     />
   )
 }
