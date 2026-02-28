@@ -38,11 +38,10 @@ import useTranslation from '@/hooks/use-translation'
 import { apiClient } from '@/lib/api-client'
 import { region, regions } from '@/lib/consts'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Search, Share } from 'lucide-react'
+import { ChevronDownIcon, Search, Share } from 'lucide-react'
 import NextImage from 'next/image'
-import { version } from 'node:punycode'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import z from 'zod'
 
 const difficulties = [
@@ -58,6 +57,7 @@ const formSchema = z.object({
   search: z.string(),
   region: z.literal(regions),
   difficulty: z.literal(difficulties),
+  mirrored: z.boolean(),
 })
 
 interface song {
@@ -73,6 +73,43 @@ const ChartViewer = () => {
 
   const [songs, setSongs] = useState<song[]>([])
   const [loading, setLoading] = useState(true)
+
+  const loadSongs = async ({
+    query,
+    difficulties,
+    image_type,
+    region,
+    mirrored,
+  }: {
+    query: string
+    difficulties: string[]
+    image_type: 'png' | 'webp'
+    region: region
+    mirrored: boolean
+  }) => {
+    try {
+      const res = await apiClient(
+        '/api/tools/music_search',
+        {
+          body: JSON.stringify({
+            region,
+            query,
+            difficulties,
+            image_type,
+            mirrored,
+          }),
+          method: 'POST',
+        },
+        { unprotected: true },
+      )
+
+      const { songs: allSongs } = await res.json()
+      setSongs(allSongs)
+    } finally {
+      setLoading(false)
+      setPage(0)
+    }
+  }
 
   const [range, setRange] = useState(8)
   const [page, setPage] = useState(0)
@@ -90,33 +127,32 @@ const ChartViewer = () => {
     },
   })
 
+  const formValues = useWatch({ control: form.control })
+
+  // instante update
   useEffect(() => {
-    const loadSongs = async () => {
-      try {
-        setLoading(true)
-        const res = await apiClient(
-          '/api/tools/music_search',
-          {
-            body: JSON.stringify({
-              region: options.default_region,
-              query: '',
-              difficulties: ['master'],
-              image_type: 'webp',
-            }),
-            method: 'POST',
-          },
-          { unprotected: true },
-        )
+    loadSongs({
+      region: formValues.region ?? options.default_region,
+      query: formValues.search ?? '',
+      difficulties: [formValues.difficulty ?? 'master'],
+      image_type: 'webp',
+      mirrored: formValues.mirrored ?? false,
+    })
+  }, [formValues.region, formValues.difficulty, formValues.mirrored])
 
-        const { songs: allSongs } = await res.json()
-        setSongs(allSongs)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadSongs()
-  }, [])
+  // debounce update for query updates
+  useEffect(() => {
+    const x = setTimeout(() => {
+      loadSongs({
+        difficulties: [formValues.difficulty ?? 'master'],
+        region: formValues.region ?? options.default_region,
+        query: formValues.search ?? '',
+        image_type: 'webp',
+        mirrored: formValues.mirrored ?? false,
+      })
+    }, 1000)
+    return () => clearTimeout(x)
+  }, [formValues.search])
 
   useEffect(() => {
     if (!selectedSong) {
@@ -151,35 +187,19 @@ const ChartViewer = () => {
   }, [selectedSong])
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      setLoading(true)
-      const res = await apiClient(
-        '/api/tools/music_search',
-        {
-          body: JSON.stringify({
-            region: values.region,
-            query: values.search,
-            difficulties: [values.difficulty],
-            image_type: 'webp',
-          }),
-          method: 'POST',
-        },
-        { unprotected: true },
-      )
-
-      const { songs: allSongs } = await res.json()
-      setSongs(allSongs)
-      const i = allSongs.indexOf(selectedSong ?? allSongs[0])
-      setPage(Math.floor(i / range) + 1)
-    } finally {
-      setLoading(false)
-    }
+    loadSongs({
+      region: values.region,
+      query: values.search,
+      difficulties: [values.difficulty],
+      image_type: 'webp',
+      mirrored: values.mirrored,
+    })
   }
 
   return (
-    <div className='flex items-center justify-center p-2 w-full h-full flex-col gap-5'>
+    <div className='flex items-center justify-center p-2 sm:w-fit h-full flex-col gap-5 w-110'>
       <Card
-        className='max-w-lg w-full'
+        className='w-full'
         variant='main'
       >
         <Form {...form}>
@@ -239,6 +259,7 @@ const ChartViewer = () => {
                   )}
                 />
                 <Button
+                  size='sm'
                   type='submit'
                   className='h-7.5 shadow-xs cursor-pointer'
                 >
@@ -261,23 +282,38 @@ const ChartViewer = () => {
                             form.setValue('difficulty', v as any)
                           }
                         >
-                          <SelectTrigger
-                            className='border-border'
-                            size='sm'
+                          <DifficultyBadge
+                            difficulty={form.getValues('difficulty')}
                           >
-                            <SelectValue>
-                              {loc(
+                            <SelectTrigger
+                              className='border-0 border-none shadow-none focus-visible:ring-0 bg-tranpsarent dark:bg-tranpsarent hover:dark:bg-tranpsarent'
+                              size='sm'
+                              hideIcon={true}
+                            >
+                              <SelectValue>
+                                {/* {loc(
                                 `difficulties.${form.getValues('difficulty')}`,
-                              )}
-                            </SelectValue>
-                          </SelectTrigger>
+                              )} */}
+                                {loc(
+                                  `difficulties.${form.getValues('difficulty')}`,
+                                )}
+                                {form.getValues('difficulty') === 'append' ?
+                                  <ChevronDownIcon className='size-4 text-purple-600 dark:text-purple-400' />
+                                : <ChevronDownIcon className='size-4 text-inherit' />
+                                }
+                              </SelectValue>
+                            </SelectTrigger>
+                          </DifficultyBadge>
                           <SelectContent>
                             {difficulties.map((diff, i) => (
                               <SelectItem
                                 value={diff}
                                 key={i}
                               >
-                                {loc(`difficulties.${diff}`)}
+                                {/* {loc(`difficulties.${diff}`)} */}
+                                <DifficultyBadge difficulty={diff}>
+                                  {loc(`difficulties.${diff}`)}
+                                </DifficultyBadge>
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -299,7 +335,7 @@ const ChartViewer = () => {
           <Spinner className='size-8' />
         </Card>
       : <>
-          <div className='flex gap-1 items-center justify-center flex-wrap max-w-full w-121 md:w-182 lg:w-243'>
+          <div className='flex gap-1 items-start justify-start flex-wrap max-w-full w-121 md:w-182 lg:w-243'>
             {songs.slice(page * range, (page + 1) * range).map((song, i) => (
               <Card
                 key={i}
@@ -310,7 +346,7 @@ const ChartViewer = () => {
                 <CardHeader>
                   <CardTitle>{song.title}</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className='space-y-2'>
                   <NextImage
                     src={song.jacket_url}
                     alt={song.title}
@@ -318,27 +354,37 @@ const ChartViewer = () => {
                     height={800}
                     className='w-full max-w-80 rounded-md border-2'
                   />
+                  <div className='flex w-full items-center justify-start flex-wrap gap-1'>
+                    {song.difficulties.map((diff, i) => (
+                      <DifficultyBadge
+                        key={i}
+                        difficulty={diff}
+                      >
+                        {loc(`difficulties.${diff}`).toUpperCase()}
+                      </DifficultyBadge>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             ))}
-            <div className='flex items-center justify-center mt-2 col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4 flex-col gap-2'>
-              <p className='text-sm text-muted-foreground'>
-                Showing {page * range + 1}{' '}
-                {Math.min((page + 1) * range, songs.length) !==
-                  page * range + 1 &&
-                  `to ${Math.min((page + 1) * range, songs.length)}`}{' '}
-                of {songs.length}
-              </p>
+          </div>
+          <div className='flex items-center justify-center mt-2 col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4 flex-col gap-2'>
+            <p className='text-sm text-muted-foreground'>
+              Showing {page * range + 1}{' '}
+              {Math.min((page + 1) * range, songs.length) !==
+                page * range + 1 &&
+                `to ${Math.min((page + 1) * range, songs.length)}`}{' '}
+              of {songs.length}
+            </p>
 
-              <Pagination
-                page={page}
-                setPage={setPage}
-                maxPages={Math.max(0, Math.ceil(songs.length / range) - 1)}
-                range={range}
-                setRange={setRange}
-                itemCountList={[4, 8, 12, 16, 24, 32]}
-              />
-            </div>
+            <Pagination
+              page={page}
+              setPage={setPage}
+              maxPages={Math.max(0, Math.ceil(songs.length / range) - 1)}
+              range={range}
+              setRange={setRange}
+              itemCountList={[4, 8, 12, 16, 24, 32]}
+            />
           </div>
           <Dialog
             open={selectedSong !== null}
@@ -350,12 +396,9 @@ const ChartViewer = () => {
               <DialogContent className='max-w-none! w-max min-w-80 min-h-40'>
                 <DialogHeader className='flex items-center justify-start gap-4 flex-row mb-3'>
                   <DialogTitle>{selectedSong.title}</DialogTitle>
-                  <Badge
-                    variant='default'
-                    className='rounded-md'
-                  >
+                  <DifficultyBadge difficulty={form.getValues('difficulty')}>
                     {loc(`difficulties.${form.getValues('difficulty')}`)}
-                  </Badge>
+                  </DifficultyBadge>
                 </DialogHeader>
                 {chartLoading || !chart ?
                   <div className='w-2xl aspect-video bg-accent flex items-center justify-center rounded-sm flex-col gap-4'>
@@ -384,6 +427,23 @@ const ChartViewer = () => {
         </>
       }
     </div>
+  )
+}
+
+const DifficultyBadge = ({
+  difficulty,
+  children,
+}: {
+  difficulty: (typeof difficulties)[number]
+  children: React.ReactNode
+}) => {
+  return (
+    <Badge
+      className='rounded-md'
+      variant={`outline-${difficulty}`}
+    >
+      {children}
+    </Badge>
   )
 }
 

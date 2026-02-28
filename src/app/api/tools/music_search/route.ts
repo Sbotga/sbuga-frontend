@@ -47,7 +47,7 @@ export const POST = async (request: Request) => {
     await mainApi.api.searchMusicsApiPjskDataMusicsSearchPost({
       region: body.region,
       query: body.query,
-      difficulties: ['append'],
+      difficulties: body.difficulties,
     })
 
   const { ids }: { ids: number[] } = await searchResponse.json()

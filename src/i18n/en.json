@@ -24,7 +24,15 @@
     "hard": "Hard",
     "expert": "Expert",
     "master": "Master",
-    "append": "Append"
+    "append": "Append",
+    "short": {
+      "easy": "EAS",
+      "normal": "NOR",
+      "hard": "HAR",
+      "expert": "EXP",
+      "master": "MAS",
+      "append": "APP"
+    }
   },
   "tools": {
     "title": "Tools",
