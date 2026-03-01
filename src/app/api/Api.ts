@@ -92,6 +92,8 @@ export interface SignupBody {
   display_name: string
   /** Username */
   username: string
+  /** Email */
+  email: string
   /** Password */
   password: string
   /** Turnstile Response */
@@ -116,6 +118,12 @@ export interface ValidationError {
   input?: any
   /** Context */
   ctx?: object
+}
+
+/** VerifyEmailBody */
+export interface VerifyEmailBody {
+  /** Token */
+  token: string
 }
 
 export type QueryParamsType = Record<string | number, any>
@@ -415,6 +423,28 @@ export class Api<
       }),
 
     /**
+     * @description Permanently deletes the authenticated account and all associated S3 assets. Does not require email verification.
+     *
+     * @tags Account
+     * @name DeleteAccountApiAccountsDeleteDelete
+     * @summary Delete account
+     * @request DELETE:/api/accounts/delete
+     */
+    deleteAccountApiAccountsDeleteDelete: (params: RequestParams = {}) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/accounts/delete`,
+        method: 'DELETE',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
      * @description Changes the display name for the authenticated account.
      *
      * @tags Account
@@ -434,6 +464,86 @@ export class Api<
         }
       >({
         path: `/api/accounts/display_name`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Sends a verification email to the authenticated account's email address. Can be used to resend if not yet verified.
+     *
+     * @tags Account
+     * @name SendVerificationEmailApiAccountsEmailSendPost
+     * @summary Send verification email
+     * @request POST:/api/accounts/email/send
+     */
+    sendVerificationEmailApiAccountsEmailSendPost: (
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/accounts/email/send`,
+        method: 'POST',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Verifies email from a link clicked in the verification email. Redirects to the frontend on success.
+     *
+     * @tags Account
+     * @name VerifyEmailGetApiAccountsEmailVerifyVerifyGet
+     * @summary Verify email (browser)
+     * @request GET:/api/accounts/email/verify/verify
+     */
+    verifyEmailGetApiAccountsEmailVerifyVerifyGet: (
+      query: {
+        /** Token */
+        token: string
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        any,
+        void | {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/accounts/email/verify/verify`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Verifies email from a token submitted by the frontend. Returns new access and refresh tokens.
+     *
+     * @tags Account
+     * @name VerifyEmailPostApiAccountsEmailVerifyVerifyPost
+     * @summary Verify email (frontend)
+     * @request POST:/api/accounts/email/verify/verify
+     */
+    verifyEmailPostApiAccountsEmailVerifyVerifyPost: (
+      data: VerifyEmailBody,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/accounts/email/verify/verify`,
         method: 'POST',
         body: data,
         type: ContentType.Json,

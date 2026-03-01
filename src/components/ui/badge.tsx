@@ -17,15 +17,15 @@ const badgeVariants = cva(
         outline:
           'border-border text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
         'outline-easy':
-          'border-lime-800 text-lime-800 bg-lime-200 dark:border-lime-200 dark:text-lime-200 dark:bg-lime-800',
+          'border-lime-500 text-lime-800 bg-lime-200 dark:text-lime-200 dark:bg-lime-800',
         'outline-normal':
-          'border-cyan-800 text-cyan-800 bg-cyan-200 dark:border-cyan-200 dark:text-cyan-200 dark:bg-cyan-800',
+          'border-cyan-500 text-cyan-800 bg-cyan-200 dark:text-cyan-200 dark:bg-cyan-800',
         'outline-hard':
-          'border-amber-800 text-amber-800 bg-amber-200 dark:border-amber-200 dark:text-amber-200 dark:bg-amber-800',
+          'border-amber-500 text-amber-800 bg-amber-200 dark:text-amber-200 dark:bg-amber-800',
         'outline-expert':
-          'border-rose-800 text-rose-800 bg-rose-200 dark:border-rose-200 dark:text-rose-200 dark:bg-rose-800',
+          'border-rose-500 text-rose-800 bg-rose-200 dark:text-rose-200 dark:bg-rose-800',
         'outline-master':
-          'border-purple-800 text-purple-800 bg-purple-200 dark:border-purple-200 dark:text-purple-200 dark:bg-purple-800',
+          'border-purple-500 text-purple-800 bg-purple-200 dark:text-purple-200 dark:bg-purple-800',
         'outline-append':
           'border-none text-indigo-800 bg-linear-135 from-indigo-200 to-fuchsia-200 dark:text-indigo-200 dark:from-indigo-800 dark:to-fuchsia-800',
         ghost: '[a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
@@ -48,7 +48,7 @@ function Badge({
   const Comp = asChild ? Slot.Root : 'span'
 
   return variant === 'outline-append' ?
-      <div className='p-px rounded-md bg-linear-135 from-indigo-500 to-fuchsia-500 dark:from-indigo-300 dark:to-fuchsia-300 flex items-center justify-center'>
+      <div className='p-px rounded-md bg-linear-135 from-indigo-500 to-fuchsia-500  flex items-center justify-center'>
         <Comp
           data-slot='badge'
           data-variant={variant}
@@ -59,7 +59,7 @@ function Badge({
           )}
           {...props}
         >
-          <span className='bg-linear-135 from-indigo-600 to-fuchsia-600 dark:from-indigo-200 dark:to-fuchsia-200 text-transparent bg-clip-text'>
+          <span className='bg-linear-135 from-indigo-700 to-fuchsia-700 dark:from-indigo-200 dark:to-fuchsia-200 text-transparent bg-clip-text'>
             {props.children}
           </span>
         </Comp>

@@ -335,7 +335,7 @@ const ChartViewer = () => {
           <Spinner className='size-8' />
         </Card>
       : <>
-          <div className='flex gap-1 items-start justify-start flex-wrap max-w-full w-121 md:w-182 lg:w-243'>
+          <div className='flex gap-1 items-stretch justify-start flex-wrap max-w-full w-121 md:w-182 lg:w-243'>
             {songs.slice(page * range, (page + 1) * range).map((song, i) => (
               <Card
                 key={i}
@@ -346,7 +346,7 @@ const ChartViewer = () => {
                 <CardHeader>
                   <CardTitle>{song.title}</CardTitle>
                 </CardHeader>
-                <CardContent className='space-y-2'>
+                <CardContent className='h-full flex flex-col gap-2 items-center justify-between'>
                   <NextImage
                     src={song.jacket_url}
                     alt={song.title}
