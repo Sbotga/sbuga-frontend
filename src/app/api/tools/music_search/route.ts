@@ -54,8 +54,13 @@ export const POST = async (request: Request) => {
 
   const songsList: simpleMusic[] = []
 
-  for (const music of musics) {
-    if (ids.includes(music.id)) songsList.push(music)
+  // for (const music of musics) {
+  //   if (ids.includes(music.id)) songsList.push(music)
+  // }
+
+  for (const id of ids) {
+    const song = musics.find((x) => x.id === id)
+    if (song) songsList.push(song)
   }
 
   return NextResponse.json({ songs: songsList })
