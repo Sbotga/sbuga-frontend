@@ -16,6 +16,8 @@ import { useEffect, useState } from 'react'
 const Account = () => {
   const params = useParams<{ username: string }>()
 
+  const [noAccount, setNoAccount] = useState(false)
+
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<{
     username: string
@@ -35,7 +37,7 @@ const Account = () => {
         )
 
         if (!res.ok) {
-          redirect('/')
+          setNoAccount(true)
         }
 
         const data = await res.json()
@@ -60,7 +62,20 @@ const Account = () => {
     )
   }
 
-  if (!user) redirect('/login')
+  if (!user || noAccount)
+    return (
+      <Card
+        className='min-w-md relative group/card flex items-center justify-center min-h-35'
+        variant='main'
+      >
+        <CardHeader className='w-full items-center justify-center flex flex-col gap-4'>
+          <CardTitle className='text-xl'>404 Not Found</CardTitle>
+          <CardDescription>
+            Sorry, this account could not be found.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    )
 
   return (
     <Card
