@@ -243,11 +243,9 @@ const SignupPage = () => {
                     /> */}
                     <Turnstile
                       key={captchaKey}
-                      // 1x00000000000000000000AA
                       siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ''}
-                      onSuccess={(token) =>
-                        form.setValue('turnstile_response', token)
-                      }
+                      className='mx-auto'
+                      onSuccess={(token) => form.setValue('turnstile_response', token)}
                       onExpire={() => form.setValue('turnstile_response', '')}
                     />
                   </FormControl>
