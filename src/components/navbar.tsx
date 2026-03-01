@@ -32,6 +32,12 @@ import {
   SelectValue,
 } from './ui/select'
 import { useAuth } from '@/context/AuthContext'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from './ui/accordion'
 
 const navigation = {
   information: [
@@ -43,21 +49,9 @@ const navigation = {
 
 type Navigation = typeof navigation
 type NavKey = keyof Navigation
-type NavPage<K extends NavKey> = Navigation[K][number]
-
-function mkKey<
-  K extends NavKey,
-  P extends NavPage<K>,
-  F extends 'title' | 'description',
->(k: K, p: P, f: F) {
-  return `${k}.${p}.${f}` as `${K}.${P}.${F}`
-}
 
 type LocFn = ReturnType<typeof useTranslation>['loc']
 type LocKey = Parameters<LocFn>[0]
-
-const tools = ['why_inappropriate'] as const
-const information = ['comic_viewer', 'stamp_viewer'] as const
 
 const OptionsMenu = ({
   options,
@@ -219,60 +213,53 @@ const Navbar = () => {
           </div>
           <div
             className={twMerge(
-              'absolute top-full left-0 right-0 w-full flex items-center justify-center flex-col gap-3 p-3 bg-background border-t border-b border-border overflow-hidden',
+              'absolute top-full left-0 right-0 w-full bg-background border-t border-b flex items-center justify-center flex-col gap-3 p-3 border-border overflow-hidden',
               !mobileMenuOpened && 'hidden',
             )}
           >
-            <div className='flex w-full items-center justify-center'>
-              <h2 className='uppercase text-muted-foreground text-xs'>
-                {loc('tools.title')}
-              </h2>
-            </div>
-            <div className='flex flex-col gap-1 items-center justify-center w-full'>
-              {tools.map((page, i) => (
-                <Fragment key={i}>
-                  <Link
-                    href={`/tools/${page}`}
-                    onClick={() => setMobileMenuOpened(false)}
-                    className='w-full p-2 hover:bg-accent rounded'
+            <Accordion
+              defaultValue={[]}
+              type='multiple'
+              className='w-full flex items-center justify-center flex-col gap-3'
+            >
+              {(Object.keys(navigation) as NavKey[]).map((k, k_i) => (
+                <Fragment key={k}>
+                  <AccordionItem
+                    value={k}
+                    className='w-full'
                   >
-                    <h2 className='font-semibold'>
-                      {loc(`tools.${page}.title`)}
-                    </h2>
-                    <p className='text-sm text-muted-foreground'>
-                      {loc(`tools.${page}.description`)}
-                    </p>
-                  </Link>
-                  {i !== tools.length - 1 && <Separator />}
+                    <AccordionTrigger>
+                      <div className='flex w-full items-center justify-center'>
+                        <h2 className='uppercase text-muted-foreground text-xs'>
+                          {loc(`${k}.title`)}
+                        </h2>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className='flex flex-col gap-1 items-center justify-center w-full'>
+                        {navigation[k].map((page, i) => (
+                          <Fragment key={i}>
+                            <Link
+                              href={`/${k}/${page}`}
+                              onClick={() => setMobileMenuOpened(false)}
+                              className='w-full p-2 hover:bg-accent rounded'
+                            >
+                              <h2 className='font-semibold'>
+                                {loc(`${k}.${page}.title` as any)}
+                              </h2>
+                              <p className='text-sm text-muted-foreground'>
+                                {loc(`${k}.${page}.description` as any)}
+                              </p>
+                            </Link>
+                          </Fragment>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
                 </Fragment>
               ))}
-            </div>
-            <Separator />
-            <div className='flex w-full items-center justify-center'>
-              <h2 className='uppercase text-muted-foreground text-xs'>
-                {loc('information.title')}
-              </h2>
-            </div>
-            <div className='flex flex-col gap-1 items-center justify-center w-full'>
-              {information.map((page, i) => (
-                <Fragment key={i}>
-                  <Link
-                    href={`/information/${page}`}
-                    onClick={() => setMobileMenuOpened(false)}
-                    className='w-full p-2 hover:bg-accent rounded'
-                  >
-                    <h2 className='font-semibold'>
-                      {loc(`information.${page}.title`)}
-                    </h2>
-                    <p className='text-sm text-muted-foreground'>
-                      {loc(`information.${page}.description`)}
-                    </p>
-                  </Link>
-                  {i !== tools.length - 1 && <Separator />}
-                </Fragment>
-              ))}
-            </div>
-            <Separator />
+            </Accordion>
+            <Separator className='-mt-3' />
             <OptionsMenu
               options={options}
               setOptions={setOptions}
