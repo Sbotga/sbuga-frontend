@@ -109,8 +109,10 @@ const LoginPage = () => {
                   </FormLabel>
                   <FormControl>
                     <Input
-                      placeholder='Sbuga_123'
+                      placeholder='sbuga123'
                       {...field}
+                      onChange={(e) => field.onChange(e.target.value.toLowerCase())}
+                      maxLength={19}
                     />
                   </FormControl>
                   <FormMessage processor={loc as (s: string) => string} />
