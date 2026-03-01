@@ -1,17 +1,13 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/context/AuthContext'
 import { apiClient } from '@/lib/api-client'
 import { redirect, useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
-const VerifyEmail = () => {
+const VerifyEmailContent = () => {
   const { loading, user } = useAuth()
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
@@ -26,19 +22,14 @@ const VerifyEmail = () => {
         method: 'POST',
         body: JSON.stringify({ token }),
       })
-
       console.log(response)
     }
-
     tryVerify()
   }
 
   return (
     <div className='w-full h-full flex items-center justify-center'>
-      <Card
-        variant='main'
-        className='min-w-md'
-      >
+      <Card variant='main' className='min-w-md'>
         <CardHeader>
           <CardTitle>Verify your Email Address</CardTitle>
           <CardDescription>
@@ -50,9 +41,7 @@ const VerifyEmail = () => {
               variant='link'
               className='text-secondary-foreground text-xs px-1 cursor-pointer'
               onClick={async () => {
-                await apiClient('/api/auth/resend_verification', {
-                  method: 'POST',
-                })
+                await apiClient('/api/auth/resend_verification', { method: 'POST' })
               }}
             >
               Resend it.
@@ -63,5 +52,11 @@ const VerifyEmail = () => {
     </div>
   )
 }
+
+const VerifyEmail = () => (
+  <Suspense>
+    <VerifyEmailContent />
+  </Suspense>
+)
 
 export default VerifyEmail
