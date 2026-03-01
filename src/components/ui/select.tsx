@@ -47,7 +47,7 @@ function SelectTrigger({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: 'sm' | 'default'
-  hideIcon: boolean
+  hideIcon?: boolean
 }) {
   return (
     <SelectPrimitive.Trigger
