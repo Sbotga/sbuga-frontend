@@ -9,6 +9,12 @@ import {
   ReactNode,
 } from 'react'
 
+// exported variable used by api-client to read the current user outside of React
+export let currentUser: User | null = null
+export const setCurrentUser = (u: User | null) => {
+  currentUser = u
+}
+
 interface User {
   id: number
   display_name: string
@@ -19,6 +25,7 @@ interface User {
   profile_hash: string
   banner_hash: string
   banned: boolean
+  email_verified: boolean
 }
 
 interface AuthContextType {
@@ -33,6 +40,7 @@ interface AuthContextType {
     username: string
     display_name: string
     password: string
+    email: string
     turnstile_response: string
   }) => Promise<{ success: boolean; message: string | null }>
   logout: () => void
@@ -52,6 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (res.ok) {
           const data = await res.json()
           setUser(data.user)
+          setCurrentUser(data.user)
         }
       } finally {
         setLoading(false)
@@ -72,12 +81,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         method: 'POST',
         body: JSON.stringify(credentials),
       },
-      { unprotected: true },
+      { unprotected: true, noEmailVerify: true },
     )
 
     if (res.ok) {
-      const { user } = await res.json()
-      setUser(user)
+      const meRes = await apiClient('/api/auth/me')
+      if (meRes.ok) {
+        const data = await meRes.json()
+
+        setUser(data.user)
+        setCurrentUser(data.user)
+
+        if (!data.user.email_verified) window.location.href = '/verify_email'
+      }
 
       return { success: true, message: '' }
     }
@@ -90,15 +106,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     display_name: string
     password: string
     turnstile_response: string
+    email: string
   }) => {
-    const res = await apiClient('/api/auth/signup', {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-    })
+    const res = await apiClient(
+      '/api/auth/signup',
+      {
+        method: 'POST',
+        body: JSON.stringify(credentials),
+      },
+      { unprotected: true, noEmailVerify: true },
+    )
 
     if (res.ok) {
       const { user } = await res.json()
       setUser(user)
+      setCurrentUser(user)
+
+      window.location.href = '/verify_email'
 
       return { success: true, message: '' }
     }
@@ -107,8 +131,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const logout = async () => {
-    await apiClient('/api/auth/logout', { method: 'POST' })
+    await apiClient(
+      '/api/auth/logout',
+      { method: 'POST' },
+      { noEmailVerify: true },
+    )
     setUser(null)
+    setCurrentUser(null)
   }
 
   return (

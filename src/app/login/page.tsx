@@ -75,9 +75,6 @@ const LoginPage = () => {
       password: values.password,
       turnstile_response: values.turnstile_response,
     })
-    if (success) {
-      return redirect('/')
-    }
     setLoading(false)
     setMessage(`login.messages.${message}`)
 

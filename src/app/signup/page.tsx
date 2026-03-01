@@ -45,6 +45,12 @@ const signupSchema = z
         'signup.form.symbol',
       ),
     confirm_password: z.string(),
+    email: z
+      .string()
+      .refine(
+        (p) => p.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/),
+        'signup.form.invalid_email',
+      ),
     turnstile_response: z.string().min(1, 'login.form.captcha'),
   })
   .refine((data) => data.password === data.confirm_password, {
@@ -69,6 +75,7 @@ const SignupPage = () => {
       display_name: '',
       password: '',
       confirm_password: '',
+      email: '',
       turnstile_response: '',
     },
   })
@@ -97,11 +104,9 @@ const SignupPage = () => {
       username: values.username,
       display_name: values.display_name,
       password: values.password,
+      email: values.email,
       turnstile_response: values.turnstile_response,
     })
-    if (success) {
-      return redirect('/')
-    }
     setLoading(false)
     setMessage(`signup.messages.${message}`)
     // reset captcha token in form and remount Turnstile
@@ -155,6 +160,25 @@ const SignupPage = () => {
                   <FormControl>
                     <Input
                       placeholder='Sbuga_123'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage processor={loc as (s: string) => string} />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='email'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className='uppercase text-muted-foreground text-xs'>
+                    {loc('signup.form.email')}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type='email'
+                      placeholder='sbotga@sbuga.com'
                       {...field}
                     />
                   </FormControl>

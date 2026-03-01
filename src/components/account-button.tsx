@@ -27,7 +27,7 @@ const AccountButton = ({
           : user === null ?
             <Link href='/login'>{loc('login.log_in')}</Link>
           : <Link
-              href='/'
+              href='/account'
               className='flex gap-2 items-center justify-center max-w-md wrap-break-word pl-3'
             >
               <Image

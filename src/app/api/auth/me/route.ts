@@ -13,8 +13,10 @@ export const GET = async () => {
     headers: { Authorization: accessToken },
   })
 
-  if (!response.ok)
-    return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
+  if (!response.ok) {
+    // console.log(await response.json())
+    return response
+  }
 
   const { user } = await response.json()
   return NextResponse.json({ user })

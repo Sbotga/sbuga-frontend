@@ -101,6 +101,7 @@
     "sign_up": "Sign Up",
     "have_account": "Already have an account?",
     "form": {
+      "email": "Email",
       "min_3": "Must be at least 3 charcters.",
       "min_8": "Must be at least 8 charcters.",
       "max_50": "Must not exceed 50 characters.",
@@ -111,10 +112,13 @@
       "password_match": "Passwords must match.",
       "display_name": "Display name",
       "confirm_password": "Confirm Password",
-      "username_validation": "Must only contain lowercase letters, numbers, and underscores"
+      "username_validation": "Must only contain lowercase letters, numbers, and underscores",
+      "invalid_email": "Enter a valid email."
     },
     "messages": {
-      "username_taken": "This username is already taken"
+      "username_taken": "This username is already taken.",
+      "email_taken": "This email is already in use.",
+      "internal_server_error": "Sorry, this action cannot be complete at this time."
     }
   }
 }

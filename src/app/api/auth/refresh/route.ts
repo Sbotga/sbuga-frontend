@@ -7,7 +7,7 @@ export const POST = async () => {
   const refreshToken = cookieStore.get('refresh_token')?.value
 
   if (!refreshToken)
-    return NextResponse.json({ error: 'No refresh token' }, { status: 401 })
+    return NextResponse.json({ detail: 'No refresh token' }, { status: 401 })
 
   const response = await mainApi.api.mainApiAccountsSessionRefreshPost({
     headers: { Authorization: refreshToken },
