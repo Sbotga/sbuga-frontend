@@ -27,12 +27,16 @@ const signupSchema = z
   .object({
     username: z
       .string()
-      .min(3, 'signup.form.min_3')
+      .min(4, 'signup.form.min_4')
+      .max(19, 'signup.form.max_19')
       .refine((u) => {
         const m = u.match(/[a-z0-9_]+/g)
         return m && m.length === 1 && m[0].length === u.length
       }, 'signup.form.username_validation'),
-    display_name: z.string(),
+    display_name: z
+      .string()
+      .min(2, 'signup.form.min_2')
+      .max(29, 'signup.form.max_29'),
     password: z
       .string()
       .min(8, 'signup.form.min_8')
@@ -143,6 +147,8 @@ const SignupPage = () => {
                     <Input
                       placeholder='sbuga123'
                       {...field}
+                      onChange={(e) => field.onChange(e.target.value.toLowerCase())}
+                      maxLength={19}
                     />
                   </FormControl>
                   <FormMessage processor={loc as (s: string) => string} />
