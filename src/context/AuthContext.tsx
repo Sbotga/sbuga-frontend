@@ -43,7 +43,15 @@ interface AuthContextType {
     email: string
     turnstile_response: string
   }) => Promise<{ success: boolean; message: string | null }>
-  logout: () => void
+  logout: () => Promise<void>
+  deleteAccount: () => Promise<void>
+  updateAccountDetails: (newDetails: {
+    username?: string
+    password?: string
+    display_name?: string
+    description?: string
+  }) => Promise<{ success: boolean; message: string | null }>
+  refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -69,6 +77,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     initAuth()
   }, [])
+
+  const refreshUser = async () => {
+    try {
+      const res = await apiClient('/api/auth/me')
+      console.log(res)
+      if (res.ok) {
+        const data = await res.json()
+        setUser(data.user)
+        setCurrentUser(data.user)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const login = async (credentials: {
     username: string
@@ -140,8 +162,52 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setCurrentUser(null)
   }
 
+  const deleteAccount = async () => {
+    await apiClient(
+      '/api/auth/delete_account',
+      { method: 'POST' },
+      { noEmailVerify: true },
+    )
+    setUser(null)
+    setCurrentUser(null)
+  }
+
+  const updateAccountDetails = async (newDetails: {
+    username?: string
+    password?: string
+    display_name?: string
+    description?: string
+  }) => {
+    const res = await apiClient('/api/auth/edit_account_details', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: newDetails.username,
+        password: newDetails.password,
+        display_name: newDetails.display_name,
+        description: newDetails.description,
+      }),
+    })
+
+    if (res.ok) {
+      return { success: true, message: null }
+    }
+
+    return { success: false, message: (await res.json()).detail }
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, signup }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        logout,
+        signup,
+        deleteAccount,
+        updateAccountDetails,
+        refreshUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )

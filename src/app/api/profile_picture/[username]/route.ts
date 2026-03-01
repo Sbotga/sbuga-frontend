@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import mainApi from '../../Api'
 import * as fs from 'fs/promises'
 import path from 'path'
+import { LosslessNumber, parse } from 'lossless-json'
+
+export const dynamic = 'force-dynamic'
 
 export const GET = async (
   _request: Request,
@@ -15,7 +18,11 @@ export const GET = async (
   if (usernameExists) {
     const response =
       await mainApi.api.getAccountApiAccountsUsernameGet(username)
-    const j = await response.json()
+    const text = await response.text()
+    const j: {
+      user: { profile_hash: string; id: LosslessNumber }
+      asset_base_url: string
+    } = parse(text) as any
     console.log(j)
     const { user, asset_base_url } = j
     const { profile_hash, id } = user

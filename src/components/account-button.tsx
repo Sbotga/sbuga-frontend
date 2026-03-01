@@ -36,6 +36,8 @@ const AccountButton = ({
                 width={20}
                 height={20}
                 className='rounded-full bg-secondary'
+                loading='eager'
+                unoptimized
               />
               {user.display_name}
             </Link>

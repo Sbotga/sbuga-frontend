@@ -12,14 +12,14 @@ export const POST = async (request: Request) => {
   const formData = await request.formData()
   const file = formData.get('file') as File | null
 
-  console.log('banner/update called', { hasFile: !!file })
+  console.log('profile_picture/update called', { hasFile: !!file })
 
   if (!file || !(file instanceof File))
     return NextResponse.json({ detail: 'No file provided' }, { status: 400 })
 
-  console.log('banner/update file size', file.size, 'name', file.name)
+  console.log('profile_picture/update file size', file.size, 'name', file.name)
 
-  const response = await mainApi.api.uploadBannerApiAccountsBannerUploadPost(
+  const response = await mainApi.api.uploadProfileApiAccountsProfileUploadPost(
     { file },
     { headers: { Authorization: accessToken } },
   )

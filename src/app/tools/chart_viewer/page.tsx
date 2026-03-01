@@ -360,7 +360,7 @@ const ChartViewer = () => {
                         key={i}
                         difficulty={diff}
                       >
-                        {loc(`difficulties.${diff}`).toUpperCase()}
+                        {loc(`difficulties.${diff}`)}
                       </DifficultyBadge>
                     ))}
                   </div>

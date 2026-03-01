@@ -9,6 +9,14 @@ const nextConfig: NextConfig = {
         hostname: 'api.sbuga.com',
       },
     ],
+    localPatterns: [
+      {
+        pathname: '/**',
+      },
+      {
+        pathname: '/api/**',
+      },
+    ],
   },
 }
 

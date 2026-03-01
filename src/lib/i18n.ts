@@ -1,3 +1,5 @@
+import React, { ReactNode } from 'react'
+
 export type Leaves<T> =
   T extends object ?
     {
@@ -12,8 +14,20 @@ export const createLoc =
   (translations: Record<TranslationKeys, any>) =>
   (
     key: TranslationKeys,
-    variables?: Record<string, string | number>,
-  ): string => {
+    variables?: Record<
+      string,
+      | string
+      | number
+      | {
+          value: string | number
+          component: ({
+            children,
+          }: {
+            children: ReactNode
+          }) => React.JSX.Element
+        }
+    >,
+  ): ReactNode => {
     let value = getNestedValue(translations, key)
 
     if (typeof value !== 'string') {
@@ -21,15 +35,58 @@ export const createLoc =
       return key
     }
 
-    if (variables)
-      Object.entries(variables).forEach(([vKey, vValue]) => {
-        value = (value as string).replace(
-          new RegExp(`{${vKey}}`, 'g'),
-          String(vValue),
-        )
-      })
+    if (!variables) {
+      return value
+    }
 
-    return value
+    // Split the string into parts based on variable placeholders
+    const parts: ReactNode[] = []
+    let remainingValue = value
+    let keyIndex = 0
+
+    const variablePattern = /{(\w+)}/g
+    let match: RegExpExecArray | null
+
+    while ((match = variablePattern.exec(value)) !== null) {
+      const [placeholder, varKey] = match
+      const matchIndex = match.index
+
+      // Add text before the placeholder
+      if (
+        matchIndex > 0 &&
+        remainingValue.startsWith(value.substring(0, matchIndex))
+      ) {
+        parts.push(value.substring(keyIndex, matchIndex))
+      }
+
+      // Add the variable with or without styles
+      const vValue = variables[varKey]
+      if (vValue !== undefined) {
+        if (typeof vValue === 'object' && vValue.component) {
+          parts.push(vValue.component({ children: String(vValue.value) }))
+        } else {
+          const simpleValue = typeof vValue === 'object' ? vValue.value : vValue
+          parts.push(String(simpleValue))
+        }
+      } else {
+        parts.push(placeholder)
+      }
+
+      keyIndex = matchIndex + placeholder.length
+    }
+
+    // Add remaining text after the last placeholder
+    if (keyIndex < value.length) {
+      parts.push(value.substring(keyIndex))
+    }
+
+    // If there's only one part and it's a string, return it as-is
+    if (parts.length === 1 && typeof parts[0] === 'string') {
+      return parts[0]
+    }
+
+    // Return as React fragment
+    return React.createElement(React.Fragment, null, ...parts)
   }
 
 import en from '@/i18n/en.json'

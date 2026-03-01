@@ -15,7 +15,7 @@ import { useTheme } from 'next-themes'
 import { Label } from './ui/label'
 import { Options, useOptions } from '@/context/OptionsContext'
 import { Fragment, useState } from 'react'
-import type { ComponentPropsWithoutRef } from 'react'
+import type { ComponentPropsWithoutRef, ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Separator } from './ui/separator'
 import Image from 'next/image'
@@ -305,7 +305,7 @@ function renderNavGroup<K extends NavKey>(k: K) {
           {navigation[k].map((page) => (
             <ListItem
               key={String(page)}
-              title={loc(`${k}.${page}.title` as LocKey)}
+              itemTitle={loc(`${k}.${page}.title` as LocKey)}
               href={`/${k}/${page}`}
             >
               {loc(`${k}.${page}.description` as LocKey)}
@@ -318,17 +318,17 @@ function renderNavGroup<K extends NavKey>(k: K) {
 }
 
 const ListItem = ({
-  title,
+  itemTitle,
   children,
   href,
   ...props
-}: ComponentPropsWithoutRef<'li'> & { href: string }) => {
+}: ComponentPropsWithoutRef<'li'> & { href: string; itemTitle: ReactNode }) => {
   return (
     <li {...props}>
       <NavigationMenuLink asChild>
         <Link href={href}>
           <div className='flex flex-col gap-1 text-sm'>
-            <div className='leading-none font-medium'>{title}</div>
+            <div className='leading-none font-medium'>{itemTitle}</div>
             <div className='text-muted-foreground line-clamp-2'>{children}</div>
           </div>
         </Link>

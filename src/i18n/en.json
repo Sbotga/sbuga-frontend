@@ -1,6 +1,9 @@
 {
   "general": {
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete"
   },
   "pagination": {
     "previous": "Previous",
@@ -94,7 +97,7 @@
       "password": "Password"
     },
     "messages": {
-      "invalid_login": "Invalid Login"
+      "invalid_login": "Invalid Username or Password"
     }
   },
   "signup": {
@@ -102,8 +105,11 @@
     "have_account": "Already have an account?",
     "form": {
       "email": "Email",
+      "min_2": "Must be at least 2 charcters.",
       "min_3": "Must be at least 3 charcters.",
       "min_8": "Must be at least 8 charcters.",
+      "max_19": "Must not exceed 19 characters.",
+      "max_29": "Must not exceed 29 characters.",
       "max_50": "Must not exceed 50 characters.",
       "upper": "Must include at least one uppercase letter",
       "lower": "Must include at least one lowercase letter",
@@ -120,5 +126,36 @@
       "email_taken": "This email is already in use.",
       "internal_server_error": "Sorry, this action cannot be complete at this time."
     }
+  },
+  "verify_email": {
+    "title": "Verify your Email Address",
+    "description": "Check your email for a message from us to verify your email.",
+    "didnt_get_it": "Didn't get it?",
+    "resend": "Resend it.",
+    "verified": "Email Verified",
+    "verified_description": "Your email has been successfully verified."
+  },
+  "account": {
+    "form": {
+      "required": "This field is required.",
+      "display_name": "Display Name",
+      "username": "Username",
+      "description": "Description",
+      "confirm_password_description": "You changed your username. For security we need your current password.",
+      "uploading_image": "Uploading Image",
+      "change_banner": "Change Banner",
+      "done": "Done",
+      "edit": "Edit"
+    },
+    "update": {
+      "pasword_required": "Current password is required to change username.",
+      "internal_server_error": "Sorry, this action cannot be completed at this time."
+    },
+    "more_options": {
+      "title": "More Options",
+      "delete_account": "Delete Account",
+      "delete_account_description": "This action is irreversible. To confirm, type your username ({username}) below and press \"Delete\"."
+    },
+    "email_not_verified": "Email not verified"
   }
 }
