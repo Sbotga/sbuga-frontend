@@ -13,7 +13,7 @@ const AccountRedirect = () => {
     if (loading) return
     if (!user) redirect('/login')
     else if (!user.email_verified) redirect('/verify_email')
-    else redirect(`/${user.username}`)
+    else redirect(`/account/${user.username}`)
   }, [loading, user])
 
   return (
