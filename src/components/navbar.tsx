@@ -44,7 +44,7 @@ const navigation = {
     'comic_viewer',
     //'stamp_viewer',
   ],
-  tools: ['why_inappropriate', 'chart_viewer'],
+  tools: ['why_inappropriate', 'chart_search'],
 } as const
 
 type Navigation = typeof navigation

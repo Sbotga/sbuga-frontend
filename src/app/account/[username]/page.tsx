@@ -303,9 +303,9 @@ const AccountPage = () => {
         variant='main'
       >
         <CardHeader className='w-full items-center justify-center flex flex-col gap-4'>
-          <CardTitle className='text-xl'>404 Not Found</CardTitle>
+          <CardTitle className='text-xl'>{loc('404.title')}</CardTitle>
           <CardDescription>
-            Sorry, this account could not be found.
+            {loc('404.description', { item: 'account' })}
           </CardDescription>
         </CardHeader>
       </Card>

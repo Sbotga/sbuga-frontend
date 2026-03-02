@@ -40,6 +40,7 @@ import { region, regions } from '@/lib/consts'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronDownIcon, Search, Share } from 'lucide-react'
 import NextImage from 'next/image'
+import { redirect } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import z from 'zod'
@@ -210,10 +211,10 @@ const ChartViewer = () => {
             <CardHeader className='flex items-center justify-center'>
               <div className='flex-1'>
                 <CardTitle className='font-header text-lg'>
-                  {loc('tools.chart_viewer.title')}
+                  {loc('tools.chart_search.title')}
                 </CardTitle>
                 <CardDescription>
-                  {loc('tools.chart_viewer.description')}
+                  {loc('tools.chart_search.description')}
                 </CardDescription>
               </div>
               <div className='flex flex-col items-end justify-center gap-1'>
@@ -246,7 +247,7 @@ const ChartViewer = () => {
                   render={({ field }) => (
                     <FormItem className='flex flex-col flex-1 items-start justify-center'>
                       <FormLabel className='uppercase text-muted-foreground text-xs'>
-                        {loc('tools.chart_viewer.search')}
+                        {loc('tools.chart_search.search')}
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -273,7 +274,7 @@ const ChartViewer = () => {
                   render={({ field }) => (
                     <FormItem className='flex flex-col flex-1 items-start justify-center'>
                       <FormLabel className='uppercase text-muted-foreground text-xs'>
-                        {loc('tools.chart_viewer.difficulty')}
+                        {loc('tools.chart_search.difficulty')}
                       </FormLabel>
                       <FormControl>
                         <Select
@@ -341,7 +342,12 @@ const ChartViewer = () => {
                 key={i}
                 className='sm:w-60 gap-1 hover:scale-101 transition-[scale]'
                 variant='main'
-                onClick={() => setSelectedSong(song)}
+                onClick={
+                  () =>
+                    redirect(
+                      `/tools/chart/${formValues.region}/${song.id}`,
+                    ) /*() => setSelectedSong(song)*/
+                }
               >
                 <CardHeader>
                   <CardTitle>{song.title}</CardTitle>
