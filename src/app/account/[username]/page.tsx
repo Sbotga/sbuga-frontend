@@ -248,7 +248,7 @@ const AccountPage = () => {
     const { success, message } = await updateAccountDetails(values)
     setLoadingAction(false)
     if (success) {
-      window.location.href = `/${values.username ?? authUser?.username}`
+      setIsEditingAccount(false)
     } else {
       setMessage(`account.update.${message}`)
     }
