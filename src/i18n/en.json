@@ -67,7 +67,8 @@
       "gameplay_charts": "Gameplay & Charts",
       "total_combo": "{number} Total Combo",
       "view_chart": "View Chart",
-      "mirrored": "Mirrored"
+      "mirrored": "Mirrored",
+      "generating": "Generating your chart..."
     }
   },
   "information": {

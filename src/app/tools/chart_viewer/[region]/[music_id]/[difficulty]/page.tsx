@@ -22,7 +22,13 @@ const ChartViewer = ({
     searchParams.get('mirrored') === 'true',
   )
 
-  const imageUrl = `/tools/chart_viewer/${region}/${music_id}/${difficulty}/image?mirrored=${mirrored}`
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    setLoaded(false)
+  }, [setLoaded, mirrored])
+
+  const imageUrl = `/tools/chart_viewer/${region}/${music_id}/${difficulty}/image?${mirrored ? 'mirrored=true&' : ''}t=${Date.now()}`
 
   useEffect(() => {
     setMirrored(searchParams.get('mirrored') === 'true')
@@ -32,8 +38,18 @@ const ChartViewer = ({
     setMirrored(checked)
 
     const newParams = new URLSearchParams(searchParams.toString())
-    newParams.set('mirrored', checked.toString())
-    router.push(`${pathname}?${newParams.toString()}`, { scroll: false })
+
+    if (checked) {
+      newParams.set('mirrored', 'true')
+    } else {
+      newParams.delete('mirrored')
+    }
+
+    const queryString = newParams.toString()
+
+    router.push(queryString ? `${pathname}?${queryString}` : pathname, {
+      scroll: false,
+    })
   }
 
   return (
@@ -49,11 +65,19 @@ const ChartViewer = ({
           className='cursor-pointer border-border'
         />
       </CardHeader>
-      <div className='relative'>
+      <div className='relative min-w-full sm:min-w-90 min-h-40 bg-accent rounded-md'>
+        {!loaded && (
+          <div className='w-full h-full absolute top-0 left-0 flex items-center justify-center text-accent-foreground z-1'>
+            {loc('tools.chart.generating')}
+          </div>
+        )}
         <img
-          className='w-full h-full rounded-sm block'
+          className='w-full h-full rounded-sm z-2'
           src={imageUrl}
           key={imageUrl}
+          onLoad={() => {
+            setLoaded(true)
+          }}
         />
         <Button
           size='icon'
