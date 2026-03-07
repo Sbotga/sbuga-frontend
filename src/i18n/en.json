@@ -91,7 +91,11 @@
         "going": "Ongoing",
         "end": "Ended"
       },
-      "rank": "Rank"
+      "rank": "Rank",
+      "cheater": {
+        "title": "Cheater",
+        "description": "If this is incorrect, you can appeal in our Discord."
+      }
     }
   },
   "components": {
