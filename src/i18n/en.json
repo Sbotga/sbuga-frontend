@@ -179,5 +179,18 @@
       "delete_account_description": "This action is irreversible. To confirm, type your username ({username}) below and press \"Delete\"."
     },
     "email_not_verified": "Email not verified"
+  },
+  "manage": {
+    "alias": {
+      "title": "Aliases",
+      "music": {
+        "title": "Song Aliases",
+        "description": "Manage song aliases"
+      },
+      "event": {
+        "title": "Event Aliases",
+        "description": "Manage event aliases"
+      }
+    }
   }
 }
