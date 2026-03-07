@@ -11,10 +11,17 @@ import {
 } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { useOptions } from '@/context/OptionsContext'
 import useTranslation from '@/hooks/use-translation'
 import { apiClient } from '@/lib/api-client'
 import { region } from '@/lib/consts'
+import { TriangleAlert } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
@@ -91,6 +98,8 @@ const RankedLeaderboard = () => {
   const [page, setPage] = useState(0)
   const [range, setRange] = useState(10)
 
+  const [cheaters, setCheaters] = useState<number[]>([])
+
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null)
 
   const getLeaderboards = async (toggleSpinner: boolean = false) => {
@@ -114,6 +123,7 @@ const RankedLeaderboard = () => {
         season_status: json.season_status,
       })
       setLeaderboard(json.top_100.rankings)
+      setCheaters(json.cheaters)
 
       const now = Date.now()
       const nextUpdate = json.next_available_update * 1000
@@ -190,12 +200,15 @@ const RankedLeaderboard = () => {
             </CardHeader>
           </Card>
           <div className='flex flex-col w-full gap-1'>
-            {leaderboard.slice(page * range, (page + 1) * range).map((x) => (
-              <LeaderboardCard
-                user={x}
-                key={x.userId}
-              />
-            ))}
+            <TooltipProvider>
+              {leaderboard.slice(page * range, (page + 1) * range).map((x) => (
+                <LeaderboardCard
+                  user={x}
+                  key={x.userId}
+                  isCheater={cheaters.includes(x.userId)}
+                />
+              ))}
+            </TooltipProvider>
           </div>
           <Pagination
             page={page}
@@ -269,7 +282,13 @@ const getRankStyles = (rank: number) => {
   }
 }
 
-const LeaderboardCard = ({ user }: { user: leaderboardUser }) => {
+const LeaderboardCard = ({
+  user,
+  isCheater,
+}: {
+  user: leaderboardUser
+  isCheater: boolean
+}) => {
   const rankDetails = calculateRankDetails(user)
   const styles = getRankStyles(user.rank)
   const isTop3 = user.rank <= 3
@@ -330,6 +349,23 @@ const LeaderboardCard = ({ user }: { user: leaderboardUser }) => {
           </div>
 
           <UserWord word={user.userProfile.word} />
+
+          {isCheater && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge
+                  variant='destructive'
+                  className='rounded-md uppercase cursor-pointer'
+                >
+                  <TriangleAlert />
+                  {loc('information.ranked_leaderboard.cheater.title')}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                {loc('information.ranked_leaderboard.cheater.description')}
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
 
         {!rankDetails.grade_name.includes('Master') && (
