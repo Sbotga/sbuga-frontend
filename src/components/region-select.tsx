@@ -17,7 +17,7 @@ const RegionSelect = ({
 }: React.ComponentProps<typeof SelectPrimitive.Root> & {
   className?: string
   size?: 'sm' | 'default'
-  extra: string[]
+  extra?: string[]
 }) => {
   const { loc } = useTranslation()
   return (
