@@ -10,6 +10,26 @@
  * ---------------------------------------------------------------
  */
 
+/** AddEventAliasBody */
+export interface AddEventAliasBody {
+  /** Event Id */
+  event_id: number
+  /** Alias */
+  alias: string
+  /** Region */
+  region?: 'en' | 'jp' | null
+}
+
+/** AddSongAliasBody */
+export interface AddSongAliasBody {
+  /** Music Id */
+  music_id: number
+  /** Alias */
+  alias: string
+  /** Region */
+  region?: 'en' | 'jp' | null
+}
+
 /** Body_upload_banner_api_accounts_banner_upload_post */
 export interface BodyUploadBannerApiAccountsBannerUploadPost {
   /**
@@ -84,6 +104,18 @@ export interface MusicSearchBody {
   difficulties?:
     | ('easy' | 'normal' | 'hard' | 'expert' | 'master' | 'append')[]
     | null
+}
+
+/** RemoveEventAliasBody */
+export interface RemoveEventAliasBody {
+  /** Alias Id */
+  alias_id: number
+}
+
+/** RemoveSongAliasBody */
+export interface RemoveSongAliasBody {
+  /** Alias Id */
+  alias_id: number
 }
 
 /** SignupBody */
@@ -823,6 +855,158 @@ export class Api<
       }),
 
     /**
+     * @description Adds a new alias for a song. Requires `manage_aliases` permission.
+     *
+     * @tags Manage
+     * @name AddSongAliasRouteApiManageAliasSongPost
+     * @summary Add song alias
+     * @request POST:/api/manage/alias/song
+     */
+    addSongAliasRouteApiManageAliasSongPost: (
+      data: AddSongAliasBody,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/manage/alias/song`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Removes a song alias by ID. Requires `manage_aliases` permission.
+     *
+     * @tags Manage
+     * @name RemoveSongAliasRouteApiManageAliasSongDelete
+     * @summary Remove song alias
+     * @request DELETE:/api/manage/alias/song
+     */
+    removeSongAliasRouteApiManageAliasSongDelete: (
+      data: RemoveSongAliasBody,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/manage/alias/song`,
+        method: 'DELETE',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Returns a list of all song aliases.
+     *
+     * @tags Manage
+     * @name GetSongAliasesRouteApiManageAliasSongGet
+     * @summary Get all song aliases
+     * @request GET:/api/manage/alias/song
+     */
+    getSongAliasesRouteApiManageAliasSongGet: (params: RequestParams = {}) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/manage/alias/song`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Adds a new alias for an event. Requires `manage_aliases` permission.
+     *
+     * @tags Manage
+     * @name AddEventAliasRouteApiManageAliasEventPost
+     * @summary Add event alias
+     * @request POST:/api/manage/alias/event
+     */
+    addEventAliasRouteApiManageAliasEventPost: (
+      data: AddEventAliasBody,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/manage/alias/event`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Removes an event alias by ID. Requires `manage_aliases` permission.
+     *
+     * @tags Manage
+     * @name RemoveEventAliasRouteApiManageAliasEventDelete
+     * @summary Remove event alias
+     * @request DELETE:/api/manage/alias/event
+     */
+    removeEventAliasRouteApiManageAliasEventDelete: (
+      data: RemoveEventAliasBody,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/manage/alias/event`,
+        method: 'DELETE',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * @description Returns a list of all event aliases.
+     *
+     * @tags Manage
+     * @name GetEventAliasesRouteApiManageAliasEventGet
+     * @summary Get all event aliases
+     * @request GET:/api/manage/alias/event
+     */
+    getEventAliasesRouteApiManageAliasEventGet: (params: RequestParams = {}) =>
+      this.request<
+        any,
+        {
+          /** @example "detail_code" */
+          detail?: string
+        }
+      >({
+        path: `/api/manage/alias/event`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
      * @description Returns a raw asset file from the PJSK asset directory for the given region.
      *
      * @tags PJSK Assets
@@ -897,7 +1081,7 @@ export class Api<
     currentEventApiPjskDataCurrentEventGet: (
       query: {
         /** Region */
-        region: 'en' | 'jp'
+        region: 'en' | 'jp' | 'tw' | 'kr'
       },
       params: RequestParams = {},
     ) =>
@@ -926,7 +1110,7 @@ export class Api<
     currentRankedApiPjskDataCurrentRankedGet: (
       query: {
         /** Region */
-        region: 'en' | 'jp'
+        region: 'en' | 'jp' | 'tw' | 'kr'
       },
       params: RequestParams = {},
     ) =>
