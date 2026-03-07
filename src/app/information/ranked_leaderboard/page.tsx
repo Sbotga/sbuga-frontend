@@ -123,7 +123,7 @@ const RankedLeaderboard = () => {
         season_status: json.season_status,
       })
       setLeaderboard(json.top_100.rankings)
-      setCheaters(json.cheaters)
+      setCheaters(json.cheaters.map((s: string) => parseInt(s)))
 
       const now = Date.now()
       const nextUpdate = json.next_available_update * 1000
@@ -145,7 +145,7 @@ const RankedLeaderboard = () => {
   }, [region])
 
   return (
-    <div className='flex flex-col gap-4 max-w-full min-w-full sm:min-w-130 sm:max-w-3/5 items-center justify-center'>
+    <div className='flex flex-col gap-4 w-full sm:w-3/5 items-center justify-center'>
       <Card
         className='w-full'
         variant='main'

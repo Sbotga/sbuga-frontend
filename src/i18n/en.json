@@ -86,7 +86,7 @@
     },
     "ranked_leaderboard": {
       "title": "Ranked Leaderboard",
-      "description": "Current Project Sekai leaderboards",
+      "description": "Current Project Sekai ranked leaderboards",
       "season_status": {
         "going": "Ongoing",
         "end": "Ended"
