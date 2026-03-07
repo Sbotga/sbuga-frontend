@@ -43,6 +43,7 @@ const navigation = {
   information: [
     'comic_viewer',
     //'stamp_viewer',
+    'ranked_leaderboard',
   ],
   tools: ['why_inappropriate', 'chart_search'],
 } as const

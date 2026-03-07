@@ -20,7 +20,9 @@
   "regions": {
     "title": "Server",
     "en": "EN (Global)",
-    "jp": "JP"
+    "jp": "JP",
+    "kr": "KR",
+    "tw": "TW"
   },
   "languages": {
     "en": "English"
@@ -81,6 +83,15 @@
     "stamp_viewer": {
       "title": "Stamp Viewer",
       "description": "View all of the Project Sekai stamps"
+    },
+    "ranked_leaderboard": {
+      "title": "Ranked Leaderboard",
+      "description": "Current Project Sekai leaderboards",
+      "season_status": {
+        "going": "Ongoing",
+        "end": "Ended"
+      },
+      "rank": "Rank"
     }
   },
   "components": {

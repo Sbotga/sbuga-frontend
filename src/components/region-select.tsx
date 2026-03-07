@@ -17,6 +17,7 @@ const RegionSelect = ({
 }: React.ComponentProps<typeof SelectPrimitive.Root> & {
   className?: string
   size?: 'sm' | 'default'
+  extra: string[]
 }) => {
   const { loc } = useTranslation()
   return (
@@ -28,12 +29,12 @@ const RegionSelect = ({
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        {regions.map((r, i) => (
+        {[...regions, ...(props.extra ?? [])].map((r, i) => (
           <SelectItem
             key={i}
             value={r}
           >
-            {loc(`regions.${r}`)}
+            {loc(`regions.${r}` as any)}
           </SelectItem>
         ))}
       </SelectContent>
