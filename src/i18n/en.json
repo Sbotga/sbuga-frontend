@@ -62,17 +62,17 @@
       "description": "View all of the charts in Project Sekai",
       "search": "Search",
       "difficulty": "difficulty"
-    },
+    }
+  },
+  "information": {
+    "title": "Information",
     "chart": {
       "gameplay_charts": "Gameplay & Charts",
       "total_combo": "{number} Total Combo",
       "view_chart": "View Chart",
       "mirrored": "Mirrored",
       "generating": "Generating your chart..."
-    }
-  },
-  "information": {
-    "title": "Information",
+    },
     "comic_viewer": {
       "title": "Comic Viewer",
       "description": "View all of the Project Sekai loading screen comics",

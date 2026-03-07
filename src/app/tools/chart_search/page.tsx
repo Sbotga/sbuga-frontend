@@ -345,7 +345,7 @@ const ChartViewer = () => {
                 onClick={
                   () =>
                     redirect(
-                      `/tools/chart/${formValues.region}/${song.id}`,
+                      `/information/chart/${formValues.region}/${song.id}`,
                     ) /*() => setSelectedSong(song)*/
                 }
               >
