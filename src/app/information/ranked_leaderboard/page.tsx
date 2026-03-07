@@ -90,6 +90,8 @@ const RankedLeaderboard = () => {
     options.default_region,
   )
 
+  const lastUpdated = useRef('')
+
   const [leaderboard, setLeaderboard] = useState<leaderboardUser[]>([])
   const [season, setSeason] = useState<season | null>(null)
 
@@ -130,6 +132,8 @@ const RankedLeaderboard = () => {
       const delay = Math.max(0, nextUpdate - now)
 
       timeoutRef.current = setTimeout(getLeaderboards, delay)
+
+      lastUpdated.current = new Date().toLocaleString()
     } finally {
       if (toggleSpinner) setPage(0)
       setLoading(false)
@@ -218,6 +222,9 @@ const RankedLeaderboard = () => {
             itemCountList={[5, 10, 20, 100]}
             maxPages={Math.max(0, Math.ceil(leaderboard.length / range) - 1)}
           />
+          <p className='text-sm text-muted-foreground'>
+            Last updated at {lastUpdated.current}
+          </p>
         </>
       }
     </div>
@@ -298,8 +305,9 @@ const LeaderboardCard = ({
   return (
     <div
       className={twMerge(
-        'rounded-xl p-[2px] w-full transition-all',
+        'rounded-xl p-[2px] w-full',
         styles.border,
+        isCheater && 'bg-red-200 dark:bg-red-950',
       )}
     >
       <Card
@@ -308,16 +316,32 @@ const LeaderboardCard = ({
           'w-full flex flex-row items-center justify-center p-3 gap-3 border-none shadow-none text-card-foreground',
           isTop3 ? 'rounded-[10px]' : '',
           user.isOwn && !isTop3 && 'ring-2 ring-primary',
+          isCheater && 'bg-red-200 dark:bg-red-950',
         )}
       >
         <div className='flex flex-col items-center justify-center min-w-[3rem] shrink-0 z-10'>
-          <span className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 leading-none mb-1'>
+          <span
+            className={twMerge(
+              'text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 leading-none mb-1',
+              isCheater && 'text-red-800 dark:text-red-300',
+            )}
+          >
             {loc('information.ranked_leaderboard.rank')}
           </span>
-          <div className='relative size-10 flex items-center justify-center'>
-            <div className={`absolute inset-0 rounded-full ${styles.circle}`} />
+          <div className='relative size-10 flex items-center justify-center flex-col'>
+            <div
+              className={twMerge(
+                'absolute inset-0 rounded-full',
+                styles.circle,
+                isCheater && 'bg-red-400 dark:bg-red-600',
+              )}
+            />
             <span
-              className={`relative z-10 font-black italic text-lg tabular-nums ${user.rank <= 3 ? 'text-white' : 'text-accent-foreground'}`}
+              className={twMerge(
+                'relative z-10 font-black italic text-lg text-center',
+                user.rank <= 3 ? 'text-white' : 'text-accent-foreground',
+                isCheater && 'text-red-950 dark:text-red-100',
+              )}
             >
               {user.rank}
             </span>
@@ -341,7 +365,7 @@ const LeaderboardCard = ({
               {user.name}
             </h2>
             <Badge
-              variant='secondary'
+              variant={isCheater ? 'destructive' : 'secondary'}
               className='rounded-md whitespace-nowrap py-0 px-1.5 text-[10px] h-4 font-bold'
             >
               {rankDetails.points}
