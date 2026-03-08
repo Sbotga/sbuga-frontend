@@ -333,7 +333,7 @@ const LeaderboardCard = ({
             />
             <span
               className={twMerge(
-                'relative z-10 font-black italic text-lg text-center',
+                'relative z-10 font-black text-lg text-center',
                 user.rank <= 3 ? 'text-white' : 'text-accent-foreground',
                 isCheater && 'text-red-950 dark:text-red-100',
               )}
@@ -369,22 +369,36 @@ const LeaderboardCard = ({
 
           <UserWord word={user.userProfile.word} />
 
-          {isCheater && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge
-                  variant='destructive'
-                  className='rounded-md uppercase cursor-pointer'
-                >
-                  <TriangleAlert />
-                  {loc('information.ranked_leaderboard.cheater.title')}
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>
-                {loc('information.ranked_leaderboard.cheater.description')}
-              </TooltipContent>
-            </Tooltip>
-          )}
+          <div className='flex gap-2 items-center'>
+            <span className='text-sm'>
+              {loc('information.ranked_leaderboard.win_rate', {
+                percent: (
+                  (user.userRankMatchSeason.winCount /
+                    user.userRankMatchSeason.playCount) *
+                  100
+                ).toFixed(2),
+              })}
+            </span>
+            {isCheater && (
+              <>
+                <span className='text-sm'>•</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge
+                      variant='destructive'
+                      className='rounded-md uppercase cursor-pointer'
+                    >
+                      <TriangleAlert />
+                      {loc('information.ranked_leaderboard.cheater.title')}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {loc('information.ranked_leaderboard.cheater.description')}
+                  </TooltipContent>
+                </Tooltip>
+              </>
+            )}
+          </div>
         </div>
 
         {!rankDetails.grade_name.includes('Master') && (

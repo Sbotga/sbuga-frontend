@@ -93,6 +93,7 @@
         "end": "Ended"
       },
       "rank": "Rank",
+      "win_rate": "{percent}% Win Rate",
       "cheater": {
         "title": "Cheater",
         "description": "If this is incorrect, you can appeal in our Discord."
