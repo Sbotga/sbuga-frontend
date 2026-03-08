@@ -210,7 +210,7 @@ const ChartViewer = () => {
                   type='submit'
                   className='h-7.5 shadow-xs cursor-pointer'
                 >
-                  Search
+                  {loc('tools.chart_search.search')}
                   <Search className='size-3.5' />
                 </Button>
               </div>

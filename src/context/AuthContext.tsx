@@ -8,7 +8,6 @@ import {
   useState,
   ReactNode,
 } from 'react'
-import { success } from 'zod'
 
 export let currentUser: User | null = null
 export const setCurrentUser = (u: User | null) => {
@@ -28,8 +27,11 @@ interface User {
   email_verified: boolean
 }
 
+export type Permission = 'manage_aliases'
+
 interface AuthContextType {
   user: User | null
+  permissions: Permission[]
   loading: boolean
   login: (credentials: {
     username: string
@@ -56,6 +58,7 @@ interface AuthContextType {
     success: boolean
     message: string | null
   }>
+  getAuthHeader: () => HeadersInit | null | undefined
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -97,7 +100,14 @@ const buildAuthHeaders = (token?: string | null): HeadersInit | undefined =>
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
+  const [permissions, setPermissions] = useState<Permission[]>([])
   const [loading, setLoading] = useState(true)
+
+  const getAuthHeader = () => {
+    const { access_token } = getStoredTokens()
+    if (!access_token) return null
+    return buildAuthHeaders(access_token)
+  }
 
   const refreshAccessToken = async () => {
     const { refresh_token } = getStoredTokens()
@@ -178,6 +188,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setCurrentUser(null)
           clearStoredTokens()
         }
+
+        await checkPermissions()
       } finally {
         setLoading(false)
       }
@@ -185,6 +197,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     initAuth()
   }, [])
+
+  useEffect(() => {
+    checkPermissions()
+  }, [user, currentUser])
+
+  const checkPermissions = async () => {
+    setPermissions([])
+    setLoading(true)
+    const perms: Permission[] = []
+
+    const { access_token } = getStoredTokens()
+    if (!access_token) {
+      clearStoredTokens()
+      setUser(null)
+      setCurrentUser(null)
+      return { success: false, message: 'not_authenticated' }
+    }
+
+    try {
+      // const res = await apiClient(
+      //   '/api/manage/aliases/music/add_alias',
+      //   {
+      //     method: 'POST',
+      //     body: JSON.stringify({}),
+      //   },
+      //   { noEmailVerify: true },
+      // )
+      const res = await mainApi.api.addSongAliasRouteApiManageAliasSongPost(
+        {} as any,
+        {
+          headers: buildAuthHeaders(access_token),
+        },
+      )
+      // console.log(res)
+      if (res.status === 400) {
+        perms.push('manage_aliases')
+      }
+    } finally {
+      setPermissions(perms)
+      setLoading(false)
+    }
+  }
 
   const refreshUser = async () => {
     setLoading(true)
@@ -386,6 +440,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider
       value={{
         user,
+        permissions,
         loading,
         login,
         logout,
@@ -394,6 +449,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         updateAccountDetails,
         refreshUser,
         resendVerificationEmail,
+        getAuthHeader,
       }}
     >
       {children}

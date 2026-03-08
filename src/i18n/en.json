@@ -22,7 +22,8 @@
     "en": "EN (Global)",
     "jp": "JP",
     "kr": "KR",
-    "tw": "TW"
+    "tw": "TW",
+    "global": "Global (All Servers)"
   },
   "languages": {
     "en": "English"
@@ -183,5 +184,42 @@
       "delete_account_description": "This action is irreversible. To confirm, type your username ({username}) below and press \"Delete\"."
     },
     "email_not_verified": "Email not verified"
+  },
+  "manage": {
+    "alias": {
+      "title": "Aliases",
+      "music": {
+        "title": "Song Aliases",
+        "description": "Manage song aliases",
+        "search": {
+          "title": "Search Song Aliases",
+          "description": "Search for songs to change their alias",
+          "placeholder": "Search"
+        },
+        "song_not_found": {
+          "title": "Song not found",
+          "description": "Could not find music with this ID.",
+          "no_data": "No song data available for id {id}."
+        },
+        "list": {
+          "title": "Aliases",
+          "empty": "No aliases yet.",
+          "alias_label": "Alias",
+          "region_label": "Region",
+          "add_title": "Add alias",
+          "add_button": "Add",
+          "delete_confirm": "Delete alias?",
+          "total": "Total aliases: {count}"
+        }
+      },
+      "event": {
+        "title": "Event Aliases",
+        "description": "Manage event aliases"
+      },
+      "alias_count": {
+        "single": "1 alias",
+        "multiple": "{count} aliases"
+      }
+    }
   }
 }
