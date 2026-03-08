@@ -1,5 +1,6 @@
 'use client'
 
+import mainApi from '@/app/Api'
 import Pagination from '@/components/pagination'
 import RegionSelect from '@/components/region-select'
 import { Badge } from '@/components/ui/badge'
@@ -19,7 +20,6 @@ import {
 } from '@/components/ui/tooltip'
 import { useOptions } from '@/context/OptionsContext'
 import useTranslation from '@/hooks/use-translation'
-import { apiClient } from '@/lib/api-client'
 import { region } from '@/lib/consts'
 import { TriangleAlert } from 'lucide-react'
 import Image from 'next/image'
@@ -107,14 +107,9 @@ const RankedLeaderboard = () => {
   const getLeaderboards = async (toggleSpinner: boolean = false) => {
     setLoading(toggleSpinner)
     try {
-      const res = await apiClient(
-        '/api/information/get_leaderboards',
-        {
-          method: 'POST',
-          body: JSON.stringify({ region }),
-        },
-        { noEmailVerify: true, unprotected: true },
-      )
+      const res = await mainApi.api.currentRankedApiPjskDataCurrentRankedGet({
+        region,
+      })
 
       const json = await res.json()
 

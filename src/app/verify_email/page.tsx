@@ -10,12 +10,12 @@ import {
 } from '@/components/ui/card'
 import { useAuth } from '@/context/AuthContext'
 import useTranslation from '@/hooks/use-translation'
-import { apiClient } from '@/lib/api-client'
 import { redirect, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
+import mainApi from '../Api'
 
 const VerifyEmailContent = () => {
-  const { loading, user } = useAuth()
+  const { loading, user, resendVerificationEmail } = useAuth()
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
   const [verified, setVerified] = useState(false)
@@ -24,10 +24,14 @@ const VerifyEmailContent = () => {
   useEffect(() => {
     if (!token) return
     const tryVerify = async () => {
-      const response = await apiClient('/api/auth/verify_email', {
-        method: 'POST',
-        body: JSON.stringify({ token }),
-      })
+      // const response = await apiClient('/api/auth/verify_email', {
+      //   method: 'POST',
+      //   body: JSON.stringify({ token }),
+      // })
+      const response =
+        await mainApi.api.verifyEmailPostApiAccountsEmailVerifyVerifyPost({
+          token,
+        })
       console.log(response)
       if (response.ok) setVerified(true)
     }
@@ -63,9 +67,7 @@ const VerifyEmailContent = () => {
                   variant='link'
                   className='text-secondary-foreground text-xs px-1 cursor-pointer'
                   onClick={async () => {
-                    await apiClient('/api/auth/resend_verification', {
-                      method: 'POST',
-                    })
+                    await resendVerificationEmail()
                   }}
                 >
                   {loc('verify_email.resend')}

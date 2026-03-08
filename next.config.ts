@@ -13,9 +13,6 @@ const nextConfig: NextConfig = {
       {
         pathname: '/**',
       },
-      {
-        pathname: '/api/**',
-      },
     ],
   },
 }

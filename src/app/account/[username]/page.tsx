@@ -21,7 +21,6 @@ import {
 } from '@/components/ui/dialog'
 import { Progress } from '@/components/ui/progress'
 import { useAuth } from '@/context/AuthContext'
-import { apiClient } from '@/lib/api-client'
 import { Check, Edit, Camera, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import useTranslation from '@/hooks/use-translation'
@@ -40,6 +39,13 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import {
+  deleteBannerImage,
+  deleteProfilePicture,
+  getUser,
+  updateBannerImage,
+  updateProfilePicture,
+} from '../actions'
 
 const accountSchema = z.object({
   username: z
@@ -128,16 +134,18 @@ const AccountPage = () => {
 
     const getUserData = async () => {
       try {
-        const res = await apiClient(
-          `/api/user/${params.username}`,
-          { method: 'GET' },
-          { noEmailVerify: true, unprotected: true },
-        )
-        if (!res.ok) {
+        // const res = await apiClient(
+        //   `/api/user/${params.username}`,
+        //   { method: 'GET' },
+        //   { noEmailVerify: true, unprotected: true },
+        // )
+
+        const u = await getUser(params.username)
+
+        if ('deatil' in u) {
           setNoAccount(true)
         } else {
-          const data = await res.json()
-          setPublicUser(data.user)
+          setPublicUser(u.user)
         }
       } finally {
         setPublicLoading(false)
@@ -155,10 +163,8 @@ const AccountPage = () => {
   const handleDeleteBanner = async () => {
     setLoadingAction(true)
     try {
-      const response = await apiClient('/api/banner_image/delete', {
-        method: 'POST',
-      })
-      if (response.ok) {
+      const response = await deleteBannerImage()
+      if (response) {
         setBannerRefresh(Date.now())
         refreshUser()
       }
@@ -171,10 +177,9 @@ const AccountPage = () => {
   const handleDeleteProfilePicture = async () => {
     setLoadingAction(true)
     try {
-      const response = await apiClient('/api/profile_picture/delete', {
-        method: 'POST',
-      })
-      if (response.ok) {
+      const response = await deleteProfilePicture()
+
+      if (response) {
         setProfileRefresh(Date.now())
         refreshUser()
       }
@@ -191,16 +196,11 @@ const AccountPage = () => {
     if (!file) return
     setIsUploading(true)
     setUploadProgress(10)
-    const formData = new FormData()
-    formData.append('file', file)
     try {
       setUploadProgress(30)
-      const response = await apiClient('/api/banner_image/update', {
-        method: 'POST',
-        body: formData,
-      })
+      const response = await updateBannerImage(file)
       setUploadProgress(80)
-      if (response.ok) {
+      if (response) {
         setBannerRefresh(Date.now())
         setUploadProgress(100)
         refreshUser()
@@ -219,16 +219,11 @@ const AccountPage = () => {
     if (!file) return
     setIsUploading(true)
     setUploadProgress(10)
-    const formData = new FormData()
-    formData.append('file', file)
     try {
       setUploadProgress(30)
-      const response = await apiClient('/api/profile_picture/update', {
-        method: 'POST',
-        body: formData,
-      })
+      const response = await updateProfilePicture(file)
       setUploadProgress(80)
-      if (response.ok) {
+      if (response) {
         setProfileRefresh(Date.now())
         setUploadProgress(100)
         refreshUser()
@@ -322,7 +317,7 @@ const AccountPage = () => {
       <div className='w-1 h-35' />
       <div className='absolute left-0 right-0 top-0 w-full aspect-10/3 rounded-t-[11px] overflow-hidden bg-accent'>
         <Image
-          src={`/api/banner_image/${displayUser.username}?t=${bannerRefresh}`}
+          src={`/banner_image/${displayUser.username}?t=${bannerRefresh}`}
           alt=''
           width={1200}
           height={960}
@@ -369,7 +364,7 @@ const AccountPage = () => {
             disabled={!isOwnProfile || isUploading}
           >
             <Image
-              src={`/api/profile_picture/${displayUser.username}?t=${profileRefresh}`}
+              src={`/profile_picture/${displayUser.username}?t=${profileRefresh}`}
               alt=''
               width={80}
               height={80}
