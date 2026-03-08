@@ -8,7 +8,6 @@ import {
   useState,
   ReactNode,
 } from 'react'
-import { success } from 'zod'
 
 export let currentUser: User | null = null
 export const setCurrentUser = (u: User | null) => {
@@ -59,6 +58,7 @@ interface AuthContextType {
     success: boolean
     message: string | null
   }>
+  getAuthHeader: () => HeadersInit | null | undefined
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -102,6 +102,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
   const [permissions, setPermissions] = useState<Permission[]>([])
   const [loading, setLoading] = useState(true)
+
+  const getAuthHeader = () => {
+    const { access_token } = getStoredTokens()
+    if (!access_token) return null
+    return buildAuthHeaders(access_token)
+  }
 
   const refreshAccessToken = async () => {
     const { refresh_token } = getStoredTokens()
@@ -182,6 +188,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setCurrentUser(null)
           clearStoredTokens()
         }
+
+        await checkPermissions()
       } finally {
         setLoading(false)
       }
@@ -196,6 +204,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const checkPermissions = async () => {
     setPermissions([])
+    setLoading(true)
     const perms: Permission[] = []
 
     const { access_token } = getStoredTokens()
@@ -227,6 +236,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     } finally {
       setPermissions(perms)
+      setLoading(false)
     }
   }
 
@@ -439,6 +449,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         updateAccountDetails,
         refreshUser,
         resendVerificationEmail,
+        getAuthHeader,
       }}
     >
       {children}

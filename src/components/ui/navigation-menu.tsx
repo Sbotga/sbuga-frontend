@@ -24,9 +24,7 @@ function NavigationMenu({
       {...props}
     >
       {children}
-      {viewport && (
-        <NavigationMenuViewport className='left-1/2 -translate-x-3/4 mt-3 bg-background' />
-      )}
+      {viewport && <NavigationMenuViewport className='mt-3 bg-background' />}
     </NavigationMenuPrimitive.Root>
   )
 }

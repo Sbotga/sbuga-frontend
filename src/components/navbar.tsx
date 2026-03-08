@@ -54,7 +54,10 @@ const management_navigation: Record<
 > = {
   alias: {
     permission: 'manage_aliases',
-    links: ['music', 'event'],
+    links: [
+      'music',
+      // 'event',
+    ],
   },
 }
 
