@@ -274,18 +274,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       setStoredTokens(data.access_token ?? null, data.refresh_token ?? null)
 
-      if (data.user) {
-        setUser(data.user)
-        setCurrentUser(data.user)
-      } else {
-        const u = await fetchCurrentUserWithTokens()
-        if (u) {
-          setUser(u)
-          setCurrentUser(u)
-        }
+      const u = await fetchCurrentUserWithTokens()
+      if (u) {
+        setUser(u)
+        setCurrentUser(u)
       }
 
-      if (data.user && !data.user.email_verified) {
+      if (currentUser && !currentUser.email_verified) {
         if (typeof window !== 'undefined')
           window.location.href = '/verify_email'
       }
@@ -315,12 +310,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       setStoredTokens(data.access_token ?? null, data.refresh_token ?? null)
 
-      if (data.user) {
-        setUser(data.user)
-        setCurrentUser(data.user)
+      const u = await fetchCurrentUserWithTokens()
+      if (u) {
+        setUser(u)
+        setCurrentUser(u)
       }
 
-      if (data.user && !data.user.email_verified) {
+      if (currentUser && !currentUser.email_verified) {
         if (typeof window !== 'undefined')
           window.location.href = '/verify_email'
       }
@@ -332,9 +328,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const logout = async () => {
+    console.log(1)
     clearStoredTokens()
+    console.log(2)
+
     setUser(null)
+    console.log(3)
+
     setCurrentUser(null)
+    console.log(4)
+
+    setLoading(false)
+    console.log(5)
   }
 
   const deleteAccount = async () => {
