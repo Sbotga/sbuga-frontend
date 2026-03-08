@@ -1,4 +1,4 @@
-import mainApi from '@/app/api/Api'
+import mainApi from '@/app/Api'
 import { region } from '@/lib/consts'
 import { NextRequest } from 'next/server'
 

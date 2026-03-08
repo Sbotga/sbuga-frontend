@@ -9,15 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import useTranslation from '@/hooks/use-translation'
-import { apiClient } from '@/lib/api-client'
 import { region } from '@/lib/consts'
 import Image from 'next/image'
 import Link from 'next/link'
 import { use, useEffect, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
+import { getAdvancedSongDetails } from '../../actions'
 
 interface song {
   id: number
@@ -78,23 +77,8 @@ const Chart = ({ params }: PageProps<'/information/chart/[region]/[id]'>) => {
     setLoading(true)
     const getSong = async () => {
       try {
-        const res = await apiClient(
-          '/api/tools/advanced_music_search',
-          {
-            body: JSON.stringify({
-              id: parseInt(id),
-              region,
-            }),
-            method: 'POST',
-          },
-          { unprotected: true, noEmailVerify: true },
-        )
-
-        if (res.ok) {
-          const s = (await res.json()).song
-          // console.log(s)
-          setSong(s)
-        }
+        const s = await getAdvancedSongDetails(region, parseInt(id))
+        setSong(s)
       } finally {
         setLoading(false)
       }

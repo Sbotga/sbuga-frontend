@@ -47,7 +47,7 @@ export const GET = async (
   // No profile hash or remote fetch failed -> serve local default from public/
   const filePath = path.join(
     process.cwd(),
-    'src/app/api/banner_image',
+    'src/app/banner_image',
     'default.png',
   )
   const buf = await fs.readFile(filePath)

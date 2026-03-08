@@ -1,5 +1,6 @@
 'use client'
 
+import mainApi from '@/app/Api'
 import RegionSelect from '@/components/region-select'
 import {
   Card,
@@ -11,7 +12,6 @@ import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
 import { useOptions } from '@/context/OptionsContext'
 import useTranslation from '@/hooks/use-translation'
-import { apiClient } from '@/lib/api-client'
 import { region } from '@/lib/consts'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
@@ -42,17 +42,10 @@ const StampViewer = () => {
     const getComics = async () => {
       try {
         setLoading(true)
-        const res = await apiClient(
-          '/api/information/get_stamps',
-          {
-            method: 'POST',
-            body: JSON.stringify({
-              region,
-              image_type: 'webp',
-            }),
-          },
-          { unprotected: true },
-        )
+        const res = await mainApi.api.getStampsApiPjskDataStampsGet({
+          region,
+          image_type: 'webp',
+        })
 
         if (res.ok) {
           const { stamps: allStamps } = await res.json()

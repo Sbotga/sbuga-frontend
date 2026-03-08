@@ -31,7 +31,7 @@ const AccountButton = ({
               className='flex gap-2 items-center justify-center max-w-md wrap-break-word pl-3'
             >
               <Image
-                src={`/api/profile_picture/${user.username}`}
+                src={`/profile_picture/${user.username}`}
                 alt=''
                 width={20}
                 height={20}

@@ -1,9 +1,8 @@
 'use client'
 
+import mainApi from '@/app/Api'
 import Pagination from '@/components/pagination'
 import RegionSelect from '@/components/region-select'
-import { Button } from '@/components/ui/button'
-import { ButtonGroup } from '@/components/ui/button-group'
 import {
   Card,
   CardContent,
@@ -19,27 +18,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 import { useOptions } from '@/context/OptionsContext'
-import { useIsMobile } from '@/hooks/use-mobile'
 import useTranslation from '@/hooks/use-translation'
-import { apiClient } from '@/lib/api-client'
 import { region } from '@/lib/consts'
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from 'lucide-react'
 import Image from 'next/image'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface comic {
   title: string
@@ -63,17 +47,10 @@ const ComicViewer = () => {
     const getComics = async () => {
       try {
         setLoading(true)
-        const res = await apiClient(
-          '/api/information/get_comics',
-          {
-            method: 'POST',
-            body: JSON.stringify({
-              region,
-              image_type: 'webp',
-            }),
-          },
-          { unprotected: true },
-        )
+        const res = await mainApi.api.getComicsApiPjskDataComicsGet({
+          region,
+          image_type: 'webp',
+        })
 
         if (res.ok) {
           const { comics: allComics } = await res.json()

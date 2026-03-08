@@ -1349,5 +1349,5 @@ export class Api<
   }
 }
 
-const mainApi = new Api({ baseUrl: process.env.API_URL })
+const mainApi = new Api({ baseUrl: process.env.NEXT_PUBLIC_API_URL })
 export default mainApi

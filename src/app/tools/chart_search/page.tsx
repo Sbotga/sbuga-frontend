@@ -12,12 +12,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
   Form,
   FormControl,
   FormField,
@@ -35,10 +29,10 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 import { useOptions } from '@/context/OptionsContext'
 import useTranslation from '@/hooks/use-translation'
-import { apiClient } from '@/lib/api-client'
+import { Difficulty, searchMusics } from './actions'
 import { region, regions } from '@/lib/consts'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronDownIcon, Search, Share } from 'lucide-react'
+import { ChevronDownIcon, Search } from 'lucide-react'
 import NextImage from 'next/image'
 import { redirect } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -80,31 +74,21 @@ const ChartViewer = () => {
     difficulties,
     image_type,
     region,
-    mirrored,
   }: {
     query: string
-    difficulties: string[]
+    difficulties: Difficulty[]
     image_type: 'png' | 'webp'
     region: region
     mirrored: boolean
   }) => {
     try {
-      const res = await apiClient(
-        '/api/tools/music_search',
-        {
-          body: JSON.stringify({
-            region,
-            query,
-            difficulties,
-            image_type,
-            mirrored,
-          }),
-          method: 'POST',
-        },
-        { unprotected: true },
-      )
+      const allSongs = await searchMusics({
+        region,
+        query,
+        difficulties,
+        image_type,
+      })
 
-      const { songs: allSongs } = await res.json()
       setSongs(allSongs)
     } finally {
       setLoading(false)
@@ -114,10 +98,6 @@ const ChartViewer = () => {
 
   const [range, setRange] = useState(8)
   const [page, setPage] = useState(0)
-
-  const [selectedSong, setSelectedSong] = useState<song | null>(null)
-  const [chartLoading, setChartLoading] = useState(false)
-  const [chart, setChart] = useState<Blob | null>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -130,7 +110,6 @@ const ChartViewer = () => {
 
   const formValues = useWatch({ control: form.control })
 
-  // instante update
   useEffect(() => {
     loadSongs({
       region: formValues.region ?? options.default_region,
@@ -141,7 +120,6 @@ const ChartViewer = () => {
     })
   }, [formValues.region, formValues.difficulty, formValues.mirrored])
 
-  // debounce update for query updates
   useEffect(() => {
     const x = setTimeout(() => {
       loadSongs({
@@ -154,38 +132,6 @@ const ChartViewer = () => {
     }, 1000)
     return () => clearTimeout(x)
   }, [formValues.search])
-
-  useEffect(() => {
-    if (!selectedSong) {
-      setChart(null)
-      return
-    }
-
-    const loadChart = async () => {
-      try {
-        setChartLoading(true)
-        const res = await apiClient(
-          '/api/tools/chart_viewer',
-          {
-            body: JSON.stringify({
-              music_id: selectedSong.id,
-              difficulty: form.getValues('difficulty'),
-              region: form.getValues('region'),
-            }),
-            method: 'POST',
-          },
-          { unprotected: true },
-        )
-
-        const b = await res.blob()
-        setChart(b)
-      } finally {
-        setChartLoading(false)
-      }
-    }
-
-    loadChart()
-  }, [selectedSong])
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     loadSongs({
@@ -392,44 +338,6 @@ const ChartViewer = () => {
               itemCountList={[4, 8, 12, 16, 24, 32]}
             />
           </div>
-          <Dialog
-            open={selectedSong !== null}
-            onOpenChange={(open) => {
-              if (!open) setSelectedSong(null)
-            }}
-          >
-            {selectedSong && (
-              <DialogContent className='max-w-none! w-max min-w-80 min-h-40'>
-                <DialogHeader className='flex items-center justify-start gap-4 flex-row mb-3'>
-                  <DialogTitle>{selectedSong.title}</DialogTitle>
-                  <DifficultyBadge difficulty={form.getValues('difficulty')}>
-                    {loc(`difficulties.${form.getValues('difficulty')}`)}
-                  </DifficultyBadge>
-                </DialogHeader>
-                {chartLoading || !chart ?
-                  <div className='w-2xl aspect-video bg-accent flex items-center justify-center rounded-sm flex-col gap-4'>
-                    <p>We're generating your chart...</p>
-                    <Spinner className='size-5' />
-                  </div>
-                : <div className='relative'>
-                    <img
-                      className='w-2xl rounded-sm'
-                      src={URL.createObjectURL(chart)}
-                      alt={selectedSong.title}
-                    />
-                    <Button
-                      size='icon'
-                      className='absolute top-3 right-3 border-none cursor-pointer'
-                      variant='outline'
-                      onClick={() => window.open(URL.createObjectURL(chart))}
-                    >
-                      <Share />
-                    </Button>
-                  </div>
-                }
-              </DialogContent>
-            )}
-          </Dialog>
         </>
       }
     </div>
