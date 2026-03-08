@@ -22,7 +22,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { useOptions } from '@/context/OptionsContext'
 import useTranslation from '@/hooks/use-translation'
-import { apiClient } from '@/lib/api-client'
+import mainApi from '../../Api'
 import { region, regions } from '@/lib/consts'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Fragment, useState } from 'react'
@@ -59,23 +59,18 @@ const WhyInappropriatePage = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true)
     setBaseText('')
+    setError('')
 
     try {
-      const req = await apiClient(
-        '/api/tools/why_inappropriate',
-        {
-          body: JSON.stringify(values),
-          method: 'POST',
-        },
-        { unprotected: true },
-      )
+      const res = await mainApi.api.mainApiToolsWhyInappropriatePost(values)
 
-      const json = await req.json()
+      const json = await res.json()
+
       if ('indexes' in json) {
         setIndexes(json.indexes)
       } else {
         setIndexes([])
-        setError(JSON.stringify(json))
+        setError(json.detail)
       }
       setBaseText(values.text)
     } finally {
