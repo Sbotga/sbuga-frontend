@@ -28,8 +28,11 @@ interface User {
   email_verified: boolean
 }
 
+export type Permission = 'manage_aliases'
+
 interface AuthContextType {
   user: User | null
+  permissions: Permission[]
   loading: boolean
   login: (credentials: {
     username: string
@@ -97,6 +100,7 @@ const buildAuthHeaders = (token?: string | null): HeadersInit | undefined =>
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
+  const [permissions, setPermissions] = useState<Permission[]>([])
   const [loading, setLoading] = useState(true)
 
   const refreshAccessToken = async () => {
@@ -185,6 +189,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     initAuth()
   }, [])
+
+  useEffect(() => {
+    checkPermissions()
+  }, [user, currentUser])
+
+  const checkPermissions = async () => {
+    setPermissions([])
+    const perms: Permission[] = []
+    try {
+      const res = await apiClient(
+        '/api/manage/aliases/music/add_alias',
+        {
+          method: 'POST',
+          body: JSON.stringify({}),
+        },
+        { noEmailVerify: true },
+      )
+      // console.log(res)
+      if (res.status === 400) {
+        perms.push('manage_aliases')
+      }
+    } finally {
+      setPermissions(perms)
+    }
+  }
 
   const refreshUser = async () => {
     setLoading(true)
@@ -386,6 +415,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider
       value={{
         user,
+        permissions,
         loading,
         login,
         logout,
