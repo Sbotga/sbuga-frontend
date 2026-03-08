@@ -187,6 +187,7 @@
     "email_not_verified": "Email not verified"
   },
   "manage": {
+    "title": "Manage",
     "alias": {
       "title": "Aliases",
       "music": {

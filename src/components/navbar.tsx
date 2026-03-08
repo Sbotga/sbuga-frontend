@@ -48,18 +48,12 @@ const navigation = {
   tools: ['why_inappropriate', 'chart_search'],
 } as const
 
-const management_navigation: Record<
-  string,
-  { permission: Permission; links: string[] }
-> = {
-  alias: {
+const management_navigation: { permission: Permission; link: string }[] = [
+  {
     permission: 'manage_aliases',
-    links: [
-      'music',
-      // 'event',
-    ],
+    link: 'alias.music',
   },
-}
+]
 
 type Navigation = typeof navigation
 type NavKey = keyof Navigation
@@ -194,11 +188,23 @@ const Navbar = () => {
                   renderNavGroup(k),
                 )}
                 {/* managemt navigation links */}
-                {Object.entries(management_navigation)
-                  .filter(
-                    ([_, v]) => !loading && permissions.includes(v.permission),
-                  )
-                  .map(([k, v]) => renderManagementNavGroup(k, v))}
+                {permissions.length > 0 && (
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger triggerMode='click'>
+                      {loc('manage.title')}
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent triggerMode='click'>
+                      <ul className='grid w-[400px] gap-2'>
+                        {management_navigation
+                          .filter(
+                            (v) =>
+                              !loading && permissions.includes(v.permission),
+                          )
+                          .map((v) => renderManagementNavGroup(v.link))}
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                )}
               </NavigationMenuList>
             </NavigationMenu>
           </div>
@@ -280,48 +286,44 @@ const Navbar = () => {
                   </AccordionItem>
                 </Fragment>
               ))}
-              {Object.entries(management_navigation)
-                .filter(
-                  ([_, v]) => !loading && permissions.includes(v.permission),
-                )
-                .map(([k, { links }]) => (
-                  <Fragment key={k}>
-                    <AccordionItem
-                      value={k}
-                      className='w-full'
-                    >
-                      <AccordionTrigger>
-                        <div className='flex w-full items-center justify-center'>
-                          <h2 className='uppercase text-muted-foreground text-xs'>
-                            {loc(`manage.${k}.title` as any)}
-                          </h2>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <div className='flex flex-col gap-1 items-center justify-center w-full'>
-                          {links.map((page, i) => (
-                            <Fragment key={i}>
-                              <Link
-                                href={`/manage/${k}/${page}`}
-                                onClick={() => setMobileMenuOpened(false)}
-                                className='w-full p-2 hover:bg-accent rounded'
-                              >
-                                <h2 className='font-semibold'>
-                                  {loc(`manage.${k}.${page}.title` as any)}
-                                </h2>
-                                <p className='text-sm text-muted-foreground'>
-                                  {loc(
-                                    `manage.${k}.${page}.description` as any,
-                                  )}
-                                </p>
-                              </Link>
-                            </Fragment>
-                          ))}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Fragment>
-                ))}
+              {permissions.length > 0 && (
+                <AccordionItem
+                  value='management'
+                  className='w-full'
+                >
+                  <AccordionTrigger>
+                    <div className='flex w-full items-center justify-center'>
+                      <h2 className='uppercase text-muted-foreground text-xs'>
+                        {loc(`manage.title` as any)}
+                      </h2>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className='flex flex-col gap-1 items-center justify-center w-full'>
+                      {management_navigation
+                        .filter(
+                          (v) => !loading && permissions.includes(v.permission),
+                        )
+                        .map(({ link }, i) => (
+                          <Fragment key={i}>
+                            <Link
+                              href={`/manage/${link.replaceAll('.', '/')}`}
+                              onClick={() => setMobileMenuOpened(false)}
+                              className='w-full p-2 hover:bg-accent rounded'
+                            >
+                              <h2 className='font-semibold'>
+                                {loc(`manage.${link}.title` as any)}
+                              </h2>
+                              <p className='text-sm text-muted-foreground'>
+                                {loc(`manage.${link}.description` as any)}
+                              </p>
+                            </Link>
+                          </Fragment>
+                        ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              )}
             </Accordion>
             <Separator className='-mt-3' />
             <OptionsMenu
@@ -368,30 +370,16 @@ function renderNavGroup<K extends NavKey>(k: K) {
   )
 }
 
-function renderManagementNavGroup(
-  k: string,
-  { links }: { permission: Permission; links: string[] },
-) {
+function renderManagementNavGroup(link: string) {
   const { loc } = useTranslation()
   return (
-    <NavigationMenuItem key={k}>
-      <NavigationMenuTrigger triggerMode='click'>
-        {loc(`manage.${k}.title` as LocKey)}
-      </NavigationMenuTrigger>
-      <NavigationMenuContent triggerMode='click'>
-        <ul className='grid w-[400px] gap-2'>
-          {links.map((page) => (
-            <ListItem
-              key={page}
-              itemTitle={loc(`manage.${k}.${page}.title` as LocKey)}
-              href={`/manage/${k}/${page}`}
-            >
-              {loc(`manage.${k}.${page}.description` as LocKey)}
-            </ListItem>
-          ))}
-        </ul>
-      </NavigationMenuContent>
-    </NavigationMenuItem>
+    <ListItem
+      key={link}
+      itemTitle={loc(`manage.${link}.title` as LocKey)}
+      href={`/manage/${link.replaceAll('.', '/')}`}
+    >
+      {loc(`manage.${link}.description` as LocKey)}
+    </ListItem>
   )
 }
 
