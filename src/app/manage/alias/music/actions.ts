@@ -1,39 +1,43 @@
 'use server'
 
 import mainApi from '@/app/Api'
-import { searchMusics } from '@/app/tools/chart_search/actions'
-import { region } from '@/lib/consts'
+import {
+  Region,
+  searchMusics,
+  SimpleMusic,
+} from '@/app/tools/chart_search/actions'
 
 export type Alias = {
   id: number
   alias: string
   music_id: number
-  region: region | null
   created_at: string
   created_by: string | null
 }
 
-export const getSongsWithAliases = async ({
-  query,
-  region,
-}: {
-  query: string
-  region: region
-}) => {
+const REGION_ORDER: Region[] = ['jp', 'en']
+
+export const getSongsWithAliases = async ({ query }: { query: string }) => {
   const aliasRes = await mainApi.api.getSongAliasesRouteApiManageAliasSongGet()
 
   // console.log(await aliasRes.json())
 
   const aliases: Alias[] = (await aliasRes.json()).aliases
 
-  const songsRes = (
-    await searchMusics({
+  const songSet: SimpleMusic[] = []
+
+  for (const r of REGION_ORDER) {
+    for (const s of await searchMusics({
       difficulties: ['master'],
       image_type: 'webp',
       query,
-      region,
-    })
-  ).map((m) => {
+      region: r,
+    })) {
+      if (songSet.filter((a) => a.id === s.id).length === 0) songSet.push(s)
+    }
+  }
+
+  const songs = songSet.map((m) => {
     const a: Alias[] = []
 
     for (let i = aliases.length - 1; i >= 0; i--) {
@@ -46,5 +50,5 @@ export const getSongsWithAliases = async ({
     return { ...m, aliases: a }
   })
 
-  return songsRes
+  return songs
 }

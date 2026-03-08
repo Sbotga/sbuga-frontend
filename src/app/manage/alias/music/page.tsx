@@ -1,9 +1,6 @@
 'use client'
 
-import mainApi from '@/app/Api'
-import { searchMusics } from '@/app/tools/chart_search/actions'
 import Pagination from '@/components/pagination'
-import RegionSelect from '@/components/region-select'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -24,9 +21,8 @@ import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/context/AuthContext'
 import { useOptions } from '@/context/OptionsContext'
 import useTranslation from '@/hooks/use-translation'
-import { region, regions } from '@/lib/consts'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { redirect, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -37,7 +33,6 @@ import Image from 'next/image'
 
 const formSchema = z.object({
   search: z.string(),
-  region: z.literal(regions),
 })
 
 interface song {
@@ -61,24 +56,16 @@ const MusicAliases = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       search: '',
-      region: options.default_region,
     },
   })
 
   const [songs, setSongs] = useState<song[]>([])
   const [loading, setLoading] = useState(true)
 
-  const loadData = async ({
-    query,
-    region,
-  }: {
-    query: string
-    region: region
-  }) => {
+  const loadData = async ({ query }: { query: string }) => {
     try {
       const songsRes = await getSongsWithAliases({
         query,
-        region,
       })
       setSongs(songsRes)
     } finally {
@@ -93,16 +80,8 @@ const MusicAliases = () => {
   const formValues = useWatch({ control: form.control })
 
   useEffect(() => {
-    loadData({
-      region: formValues.region ?? options.default_region,
-      query: formValues.search ?? '',
-    })
-  }, [formValues.region])
-
-  useEffect(() => {
     const x = setTimeout(() => {
       loadData({
-        region: formValues.region ?? options.default_region,
         query: formValues.search ?? '',
       })
     }, 1000)
@@ -111,7 +90,6 @@ const MusicAliases = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     loadData({
-      region: values.region,
       query: values.search,
     })
   }
@@ -135,27 +113,6 @@ const MusicAliases = () => {
                 <CardDescription>
                   {loc('manage.alias.music.search.description')}
                 </CardDescription>
-              </div>
-              <div className='flex flex-col items-end justify-center gap-1'>
-                <FormField
-                  control={form.control}
-                  name='region'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-col items-end justify-center'>
-                      <FormLabel className='uppercase text-muted-foreground text-xs'>
-                        {loc('regions.title')}
-                      </FormLabel>
-                      <FormControl>
-                        <RegionSelect
-                          {...field}
-                          onValueChange={(newVal: region) =>
-                            form.setValue('region', newVal)
-                          }
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
               </div>
             </CardHeader>
             <CardContent className='flex items-center justify-center gap-2 w-full flex-col'>

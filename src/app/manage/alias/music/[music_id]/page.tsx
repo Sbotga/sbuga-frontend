@@ -15,18 +15,15 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import RegionSelect from '@/components/region-select'
 import { Spinner } from '@/components/ui/spinner'
 import { Badge } from '@/components/ui/badge'
 import { Trash2, Plus } from 'lucide-react'
-import { region, regions } from '@/lib/consts'
 import useTranslation from '@/hooks/use-translation'
 
 type Alias = {
   id: number
   alias: string
   music_id: number
-  region: region | null
   created_at: string
   created_by: string | null
 }
@@ -60,7 +57,6 @@ export default function MusicAliasPage() {
   const [actionLoading, setActionLoading] = useState(false)
 
   const [newAlias, setNewAlias] = useState('')
-  const [newRegion, setNewRegion] = useState<region>(regions[0])
 
   // load music details (try en then jp) and aliases
   useEffect(() => {
@@ -77,7 +73,7 @@ export default function MusicAliasPage() {
         try {
           const res =
             await mainApi.api.getMusicsSimpleApiPjskDataMusicsSimpleGet({
-              region: 'en',
+              region: 'jp',
               image_type: 'webp',
             } as any)
           if (!mounted) return
@@ -95,7 +91,7 @@ export default function MusicAliasPage() {
           try {
             const res2 =
               await mainApi.api.getMusicsSimpleApiPjskDataMusicsSimpleGet({
-                region: 'jp',
+                region: 'en',
                 image_type: 'webp',
               } as any)
             if (!mounted) return
@@ -163,10 +159,9 @@ export default function MusicAliasPage() {
       const body = {
         music_id: musicId,
         alias: newAlias.trim(),
-        region: newRegion as region,
       }
       const res = await mainApi.api.addSongAliasRouteApiManageAliasSongPost(
-        { ...body, region: (newRegion as any) === 'global' ? null : newRegion },
+        { ...body },
         {
           headers: getAuthHeader()!,
         },
@@ -292,9 +287,6 @@ export default function MusicAliasPage() {
                       <Badge className='px-2 py-0 rounded text-lg'>
                         {a.alias}
                       </Badge>
-                      <span className='text-sm text-muted-foreground ml-2'>
-                        {loc(`regions.${a.region ?? 'global'}`)}
-                      </span>
                     </div>
                     <div className='flex items-center gap-2'>
                       <Button
@@ -334,22 +326,12 @@ export default function MusicAliasPage() {
               </div>
 
               <div>
-                <label className='text-xs uppercase text-muted-foreground'>
-                  {loc('manage.alias.music.list.region_label')}
-                </label>
-                <RegionSelect
-                  extra={['global']}
-                  value={newRegion}
-                  onValueChange={(v: region) => setNewRegion(v)}
-                />
-              </div>
-
-              <div>
                 <Button
                   onClick={handleAdd}
                   disabled={actionLoading || newAlias.trim().length === 0}
                 >
                   <Plus className='size-4' />
+                  {loc('manage.alias.music.list.add_button')}
                 </Button>
               </div>
             </div>
