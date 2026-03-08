@@ -197,14 +197,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const checkPermissions = async () => {
     setPermissions([])
     const perms: Permission[] = []
+
+    const { access_token } = getStoredTokens()
+    if (!access_token) {
+      clearStoredTokens()
+      setUser(null)
+      setCurrentUser(null)
+      return { success: false, message: 'not_authenticated' }
+    }
+
     try {
-      const res = await apiClient(
-        '/api/manage/aliases/music/add_alias',
+      // const res = await apiClient(
+      //   '/api/manage/aliases/music/add_alias',
+      //   {
+      //     method: 'POST',
+      //     body: JSON.stringify({}),
+      //   },
+      //   { noEmailVerify: true },
+      // )
+      const res = await mainApi.api.addSongAliasRouteApiManageAliasSongPost(
+        {} as any,
         {
-          method: 'POST',
-          body: JSON.stringify({}),
+          headers: buildAuthHeaders(access_token),
         },
-        { noEmailVerify: true },
       )
       // console.log(res)
       if (res.status === 400) {
