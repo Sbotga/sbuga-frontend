@@ -5,7 +5,7 @@ import {
   Region,
   searchMusics,
   SimpleMusic,
-} from '@/app/tools/chart_search/actions'
+} from '@/app/information/song_information/actions'
 
 export type Alias = {
   id: number

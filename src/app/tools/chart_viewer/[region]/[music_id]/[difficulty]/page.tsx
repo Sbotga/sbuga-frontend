@@ -58,7 +58,7 @@ const ChartViewer = ({
       variant='main'
     >
       <CardHeader className='flex items-center justify-start px-0'>
-        {loc('information.chart.mirrored')}
+        {loc('information.song.mirrored')}
         <Switch
           checked={mirrored}
           onCheckedChange={toggleMirrored}
@@ -68,7 +68,7 @@ const ChartViewer = ({
       <div className='relative min-w-full sm:min-w-90 min-h-40 bg-accent rounded-md'>
         {!loaded && (
           <div className='w-full h-full absolute top-0 left-0 flex items-center justify-center text-accent-foreground z-1'>
-            {loc('information.chart.generating')}
+            {loc('information.song.generating')}
           </div>
         )}
         <img

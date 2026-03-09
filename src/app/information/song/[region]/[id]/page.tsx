@@ -66,7 +66,7 @@ interface song {
   }[]
 }
 
-const Chart = ({ params }: PageProps<'/information/chart/[region]/[id]'>) => {
+const Chart = ({ params }: PageProps<'/information/song/[region]/[id]'>) => {
   const { loc } = useTranslation()
   const { id, region } = use(params) as { id: string; region: region }
 
@@ -151,7 +151,7 @@ const Chart = ({ params }: PageProps<'/information/chart/[region]/[id]'>) => {
       <CardContent className='space-y-6'>
         <section>
           <h2 className='text-xl mb-4 border-b pb-2 font-header'>
-            {loc('information.chart.gameplay_charts')}
+            {loc('information.song.gameplay_charts')}
           </h2>
           <div
             className={twMerge(
@@ -177,7 +177,7 @@ const Chart = ({ params }: PageProps<'/information/chart/[region]/[id]'>) => {
                       {loc(`difficulties.${diff.difficulty}`)}
                     </p>
                     <p className='text-xs text-muted-foreground mt-1 uppercase'>
-                      {loc('information.chart.total_combo', {
+                      {loc('information.song.total_combo', {
                         number: diff.total_note_count,
                       })}
                     </p>
@@ -193,7 +193,7 @@ const Chart = ({ params }: PageProps<'/information/chart/[region]/[id]'>) => {
                   <Link
                     href={`/tools/chart_viewer/${region}/${id}/${diff.difficulty}`}
                   >
-                    {loc('information.chart.view_chart')}
+                    {loc('information.song.view_chart')}
                   </Link>
                 </Button>
               </div>

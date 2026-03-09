@@ -123,7 +123,7 @@ const MusicAliases = () => {
                   render={({ field }) => (
                     <FormItem className='flex flex-col flex-1 items-start justify-center'>
                       <FormLabel className='uppercase text-muted-foreground text-xs'>
-                        {loc('tools.chart_search.search')}
+                        {loc('information.song_information.search')}
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -140,7 +140,7 @@ const MusicAliases = () => {
                   type='submit'
                   className='h-7.5 shadow-xs cursor-pointer'
                 >
-                  {loc('tools.chart_search.search')}
+                  {loc('information.song_information.search')}
                   <Search className='size-3.5' />
                 </Button>
               </div>

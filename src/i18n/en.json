@@ -59,17 +59,17 @@
         "issue_single": "{issues} issue",
         "issue_plural": "{issues} issues"
       }
-    },
-    "chart_search": {
-      "title": "Chart Search",
-      "description": "View all of the charts in Project Sekai",
-      "search": "Search",
-      "difficulty": "difficulty"
     }
   },
   "information": {
     "title": "Information",
-    "chart": {
+    "song_information": {
+      "title": "Song Information",
+      "description": "Information on every song in Project Sekai",
+      "search": "Search",
+      "difficulty": "difficulty"
+    },
+    "song": {
       "gameplay_charts": "Gameplay & Charts",
       "total_combo": "{number} Total Combo",
       "view_chart": "View Chart",

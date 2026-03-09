@@ -157,10 +157,10 @@ const ChartViewer = () => {
             <CardHeader className='flex items-center justify-center'>
               <div className='flex-1'>
                 <CardTitle className='font-header text-lg'>
-                  {loc('tools.chart_search.title')}
+                  {loc('information.song_information.title')}
                 </CardTitle>
                 <CardDescription>
-                  {loc('tools.chart_search.description')}
+                  {loc('information.song_information.description')}
                 </CardDescription>
               </div>
               <div className='flex flex-col items-end justify-center gap-1'>
@@ -193,7 +193,7 @@ const ChartViewer = () => {
                   render={({ field }) => (
                     <FormItem className='flex flex-col flex-1 items-start justify-center'>
                       <FormLabel className='uppercase text-muted-foreground text-xs'>
-                        {loc('tools.chart_search.search')}
+                        {loc('information.song_information.search')}
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -210,7 +210,7 @@ const ChartViewer = () => {
                   type='submit'
                   className='h-7.5 shadow-xs cursor-pointer'
                 >
-                  {loc('tools.chart_search.search')}
+                  {loc('information.song_information.search')}
                   <Search className='size-3.5' />
                 </Button>
               </div>
@@ -220,7 +220,7 @@ const ChartViewer = () => {
                   render={({ field }) => (
                     <FormItem className='flex flex-col flex-1 items-start justify-center'>
                       <FormLabel className='uppercase text-muted-foreground text-xs'>
-                        {loc('tools.chart_search.difficulty')}
+                        {loc('information.song_information.difficulty')}
                       </FormLabel>
                       <FormControl>
                         <Select
@@ -291,7 +291,7 @@ const ChartViewer = () => {
                 onClick={
                   () =>
                     redirect(
-                      `/information/chart/${formValues.region}/${song.id}`,
+                      `/information/song/${formValues.region}/${song.id}`,
                     ) /*() => setSelectedSong(song)*/
                 }
               >

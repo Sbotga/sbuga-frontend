@@ -44,8 +44,9 @@ const navigation = {
     'comic_viewer',
     //'stamp_viewer',
     'ranked_leaderboard',
+    'song_information',
   ],
-  tools: ['why_inappropriate', 'chart_search'],
+  tools: ['why_inappropriate'],
 } as const
 
 const management_navigation: { permission: Permission; link: string }[] = [
